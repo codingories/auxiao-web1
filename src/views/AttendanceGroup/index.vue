@@ -75,13 +75,13 @@ export default {
         let tempKeys0 = Object.keys(this.RawGroupData);
         console.log(tempKeys0);
         let dateMap = {
-          1: "星期六",
-          2: "星期日",
-          3: "星期一",
-          4: "星期二",
-          5: "星期三",
-          6: "星期四",
-          7: "星期五"
+          6: "星期六",
+          7: "星期日",
+          1: "星期一",
+          2: "星期二",
+          3: "星期三",
+          4: "星期四",
+          5: "星期五"
         };
         let finalList = [];
         let index = 1;

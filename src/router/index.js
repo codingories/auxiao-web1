@@ -46,6 +46,22 @@ export const constantRoutes = [
   {
     path: "/",
     component: Layout,
+    redirect: "/home",
+    // roles: ["admin", "editor"],
+    children: [
+      {
+        path: "home",
+        name: "home",
+        component: () => import("@/views/home/index"),
+        meta: { title: "home", icon: "user" }
+      }
+    ]
+    // alwaysShow: true
+  },
+
+  {
+    path: "/personalCenter",
+    component: Layout,
     redirect: "/personalCenter",
     // roles: ["admin", "editor"],
     children: [
@@ -83,6 +99,18 @@ export const constantRoutes = [
         name: "AttendanceGroup",
         component: () => import("@/views/AttendanceGroup/index"),
         meta: { title: "考勤组管理", icon: "tree" }
+      },
+      {
+        path: "singleDay",
+        name: "singleDay",
+        component: () => import("@/views/singleDay/index"),
+        meta: { title: "单日页面调整", icon: "calendar" }
+      },
+      {
+        path: "severalDays",
+        name: "severalDays",
+        component: () => import("@/views/severalDays/index"),
+        meta: { title: "多日页面调整", icon: "calendar" }
       }
     ]
   },
@@ -161,15 +189,80 @@ export const constantRoutes = [
   },
 
   {
-    path: "external-link",
+    path: "/backstage",
     component: Layout,
+    redirect: "/backstage/",
+    name: "backstage",
+    meta: { title: "后台设置", icon: "link" },
     children: [
       {
-        path: "https://panjiachen.github.io/vue-element-admin-site/#/",
-        meta: { title: "系统管理", icon: "link" }
+        path: "AuthorityManagement",
+        name: "AuthorityManagement",
+        component: () => import("@/views/AuthorityManagement/index"),
+        meta: { title: "权限管理", icon: "link" }
+      },
+      {
+        path: "UserManagement",
+        name: "UserManagement",
+        component: () => import("@/views/UserManagement/index"),
+        meta: { title: "用户管理", icon: "link" }
+      },
+      {
+        path: "RoleManagement",
+        name: "RoleManagement",
+        component: () => import("@/views/RoleManagement/index"),
+        meta: { title: "角色管理", icon: "link" }
       }
     ]
   },
+  {
+    path: "/workflow",
+    component: Layout,
+    redirect: "/workflow/",
+    name: "workflow",
+    meta: { title: "办公流程", icon: "tree" },
+    children: [
+      {
+        path: "MyApplication",
+        name: "MyApplication",
+        component: () => import("@/views/MyApplication/index"),
+        meta: { title: "我的申请", icon: "tree" }
+      },
+      {
+        path: "MyApproval",
+        name: "MyApproval",
+        component: () => import("@/views/MyApproval/index"),
+        meta: { title: "我的审批", icon: "tree" }
+      },
+      {
+        path: "SummaryProcess",
+        name: "SummaryProcess",
+        component: () => import("@/views/SummaryProcess/index"),
+        meta: { title: "流程汇总", icon: "tree" }
+      }
+    ]
+  },
+  // {
+  //   path: "/calendar",
+  //   component: Layout,
+  //   redirect: "/calendar/",
+  //   name: "calendar",
+  //   meta: { title: "日历模块", icon: "calendar" },
+  //   children: [
+  //     {
+  //       path: "singleDay",
+  //       name: "singleDay",
+  //       component: () => import("@/views/singleDay/index"),
+  //       meta: { title: "单日页面调整", icon: "calendar" }
+  //     },
+  //     {
+  //       path: "severalDays",
+  //       name: "severalDays",
+  //       component: () => import("@/views/severalDays/index"),
+  //       meta: { title: "多日页面调整", icon: "calendar" }
+  //     }
+  //   ]
+  // },
 
   // 404 page must be placed at the end !!!
   { path: "*", redirect: "/404", hidden: true }

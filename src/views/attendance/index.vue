@@ -1,9 +1,12 @@
 <template>
   <div class="app-container">
     <h2>当前是考勤汇总页面</h2>
+    <!-- {{tableYear}}+{{tableMonth}} -->
     <el-button type="primary" @click="lastMonth">上一月</el-button>
     <el-button type="success" @click="nextMonth">下一月</el-button>
-    <el-table :data="tableData" style="width: 100%">
+    <el-button type="warning" @click="exportExcel">导出</el-button>
+    <!-- {{tableData}} -->
+    <el-table :data="tableData" style="width: 100%" id="out-table">
       <el-table-column
         :prop="tableHeader[i].prop"
         :label="tableHeader[i].label"
@@ -18,6 +21,9 @@
 <script>
 import { getTotalAttendance } from "@/api/totalAttendance";
 import store from "@/store";
+import FileSaver from "file-saver";
+import XLSX from "xlsx";
+
 export default {
   data() {
     return {
@@ -112,22 +118,83 @@ export default {
       return this.TotalData;
     },
     lastMonth() {
-      if (this.tableMonth > 1) {
+      if (this.tableMonth >= 1) {
         this.tableMonth -= 1;
+        if (this.tableMonth === 0) {
+          this.tableMonth = 12;
+          this.tableYear -= 1;
+        }
       }
-      this.$forceUpdate();
+      this.TotalData = [];
+      this.fetchTotalData();
     },
     nextMonth() {
-      if (this.tableMonth < 12) {
+      if (this.tableMonth <= 12) {
         this.tableMonth += 1;
+        if (this.tableMonth === 13) {
+          this.tableMonth = 1;
+          this.tableYear += 1;
+        }
       }
+      this.TotalData = [];
+      this.fetchTotalData();
     },
     fetchTotalData() {
       this.listLoading = true;
       this.access_token = store.getters.token;
+      let dayList = {};
+      if (this.tableYear % 4 !== 0) {
+        dayList = {
+          1: [1, 31],
+          2: [1, 28],
+          3: [1, 31],
+          4: [1, 30],
+          5: [1, 31],
+          6: [1, 30],
+          7: [1, 31],
+          8: [1, 31],
+          9: [1, 30],
+          10: [1, 31],
+          11: [1, 30],
+          12: [1, 31]
+        };
+      } else {
+        dayList = {
+          1: [1, 31],
+          2: [1, 29],
+          3: [1, 31],
+          4: [1, 30],
+          5: [1, 31],
+          6: [1, 30],
+          7: [1, 31],
+          8: [1, 31],
+          9: [1, 30],
+          10: [1, 31],
+          11: [1, 30],
+          12: [1, 31]
+        };
+      }
+      let start_date =
+        this.tableYear +
+        "-" +
+        this.tableMonth +
+        "-" +
+        dayList[this.tableMonth][0];
+      let end_date =
+        this.tableYear +
+        "-" +
+        this.tableMonth +
+        "-" +
+        dayList[this.tableMonth][1];
       console.log(this.access_token);
-      getTotalAttendance({ access_token: this.access_token }).then(
+      console.log(start_date, end_date);
+      getTotalAttendance({
+        access_token: this.access_token,
+        start_date: start_date,
+        end_date: end_date
+      }).then(
         success => {
+          console.log(success);
           let nameList = {};
           this.TotalRawData = success.data;
           let jobNumber = Object.keys(success.data); // 获得最外层所有工号
@@ -169,6 +236,25 @@ export default {
         }
       );
       this.listLoading = false;
+    },
+    exportExcel() {
+      /* generate workbook object from table */
+      var wb = XLSX.utils.table_to_book(document.querySelector("#out-table"));
+      /* get binary string as output */
+      var wbout = XLSX.write(wb, {
+        bookType: "xlsx",
+        bookSST: true,
+        type: "array"
+      });
+      try {
+        FileSaver.saveAs(
+          new Blob([wbout], { type: "application/octet-stream" }),
+          "sheetjs.xlsx"
+        );
+      } catch (e) {
+        if (typeof console !== "undefined") console.log(e, wbout);
+      }
+      return wbout;
     }
   }
 };
