@@ -10,7 +10,7 @@
       <el-table-column
         :prop="tableHeader[i].prop"
         :label="tableHeader[i].label"
-        width="60"
+        min-width="150"
         v-for="(item,i) in tableHeader"
         :key="i"
       ></el-table-column>
@@ -110,6 +110,7 @@ export default {
       daysList.unshift(
         { prop: "Month", label: TempMonth },
         { prop: "jobNumber", label: "工号" },
+        { prop: "group", label: "组室" },
         { prop: "Name", label: "姓名" }
       );
       return daysList;
@@ -214,15 +215,60 @@ export default {
           let TotalData = [];
           let TempObj = [];
           console.log(jobNumber);
+          let status_map = {
+            1: "正常",
+            2: "迟到",
+            3: "早退",
+            4: "下午缺勤",
+            5: "缺勤",
+            6: "迟到并早退",
+            7: "因公外出",
+            8: "请假"
+          };
+
           for (let i = 0; i < jobNumber.length; i++) {
             // 遍历所有工号
             let tempobj = {};
             let innerDateKeys = Object.keys(success.data[jobNumber[i]]); // 一个人的全部打卡日期
             for (let j = 0; j < innerDateKeys.length; j++) {
               let Date = innerDateKeys[j].slice(0, 10);
-              let Status =
-                success.data[jobNumber[i]][innerDateKeys[j]].status_display;
-              tempobj[Date] = Status;
+              let tempData = success.data[jobNumber[i]][innerDateKeys[j]];
+              let lateTime = "";
+              let leaveEarlyTime = "";
+              lateTime = tempData.late_time;
+              leaveEarlyTime = tempData.leave_early_time;
+              let statusNumber = tempData.status;
+              let status;
+              if (statusNumber === 1) {
+                status = status_map[statusNumber];
+              } else if (statusNumber === 2) {
+                status = status_map[statusNumber] + ":" + lateTime + "分钟";
+              } else if (statusNumber === 3) {
+                status =
+                  status_map[statstatusNumberus] +
+                  ":" +
+                  leaveEarlyTime +
+                  "分钟";
+              } else if (statusNumber === 4) {
+                status = status_map[statusNumber];
+              } else if (statusNumber === 5) {
+                status = status_map[statusNumber];
+              } else if (statusNumber === 6) {
+                status =
+                  "迟到:" +
+                  lateTime +
+                  "分钟" +
+                  "|" +
+                  "早退:" +
+                  leaveEarlyTime +
+                  "分钟";
+              } else if (statusNumber === 7) {
+                status = status_map[statusNumber];
+              } else if (statusNumber === 8) {
+                status = status_map[statusNumber];
+              }
+
+              tempobj[Date] = status;
             }
             tempobj.jobNumber = jobNumber[i];
             tempobj.Name = jobNumberName[jobNumber[i]];

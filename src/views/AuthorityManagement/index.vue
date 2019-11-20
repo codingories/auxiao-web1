@@ -88,8 +88,6 @@ export default {
               AddAttendanceObj.name = k.name;
               AddAttendanceObj.attendance_group_id =
                 nameMap[k.attendance_group_id];
-              console.log("AddAttendanceObjAddAttendanceObjAddAttendanceObj");
-              console.log(AddAttendanceObj);
               AddAttendanceObjList.push(AddAttendanceObj);
             }
             this.addAttendance = AddAttendanceObjList;

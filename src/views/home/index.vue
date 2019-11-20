@@ -3,18 +3,19 @@
     <!-- <el-button type="primary" @click="changeStatus">编辑</el-button> -->
     <!-- <el-button type="success" @click="confirmData">确认</el-button> -->
     <!-- <el-input v-model="username" class="inputstyle" placeholder="用户名" size="medium" width="200px"></el-input> -->
+    <!-- <h2>{{infoData}}</h2> -->
     <el-row>
       <el-col
         :xl="1"
-        :md="2"
+        :md="1"
         :sm="1"
         :xs="1"
         class="item-marign-right"
-        v-for="(item,i) in topContent"
+        v-for="(item, i) in topContent"
         :key="i"
       >
-        <div class="top-item">
-          <div>{{item}}</div>
+        <div class="top-item" @click="fillFlowDetails(item.flowId)">
+          <div>{{ item.flowName }}</div>
         </div>
       </el-col>
       <el-col :xl="1" :md="1" :sm="1" :xs="1" class="item-marign-right">
@@ -23,9 +24,65 @@
         </div>
       </el-col>
 
-      <el-dialog title="添加流程" :visible.sync="dialogVisible" width="30%" :before-close="handleClose">
-        <div v-for="(item,i) in addItemList" :key="i">
-          <el-checkbox v-model="item.checked">{{item.itemName}}</el-checkbox>
+      <el-dialog
+        title="流程提交"
+        :visible.sync="processDialogVisible"
+        width="30%"
+        :before-close="handleClose"
+      >
+        <!-- <div v-for="(item,i) in addItemList" :key="i">
+          <el-checkbox v-model="item.checked">{{item.flowName}}</el-checkbox>
+        </div>-->
+        <el-form ref="form" :model="form" label-width="80px">
+          <h2></h2>
+          <el-form-item label="标题(必填)">
+            <el-input v-model="form.title"></el-input>
+          </el-form-item>
+          <el-form-item
+            v-for="(item, i) in formList"
+            :key="i"
+            :label="item.field_name"
+            v-if="item.field_type === 'text'"
+          >
+            <el-input v-model="form[item.field]"></el-input>
+          </el-form-item>
+          <el-form-item
+            v-for="(item, i) in formList"
+            :key="i"
+            :label="item.field_name"
+            v-if="item.field_type === 'date'"
+          >
+            <el-date-picker
+              v-model="form[item.field]"
+              type="datetime"
+              placeholder="选择日期时间"
+              default-time="12:00:00"
+            >
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item
+            v-for="(item, i) in formList"
+            :key="i"
+            :label="item.field_name"
+            v-if="item.field_type !== 'text' && item.field_type !== 'date'"
+          >
+            <el-input v-model="form[item.field]"></el-input>
+          </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="processDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="formConfirmStatus">确 定</el-button>
+        </span>
+      </el-dialog>
+
+      <el-dialog
+        title="添加流程"
+        :visible.sync="dialogVisible"
+        width="30%"
+        :before-close="handleClose"
+      >
+        <div v-for="(item, i) in addItemList" :key="i">
+          <el-checkbox v-model="item.checked">{{ item.flowName }}</el-checkbox>
         </div>
 
         <span slot="footer" class="dialog-footer">
@@ -40,23 +97,31 @@
         <div class="status-second">
           <!-- style="width: 100%" -->
           <el-table
-            :header-cell-style="{background:'rgba(253,112,116,50%)'}"
+            :header-cell-style="{ background: 'rgba(253,112,116,50%)' }"
             :data="tableData"
             border
             style="width: 401px"
           >
-            <el-table-column prop="info" label="通知公告" width="400px"></el-table-column>
+            <el-table-column
+              prop="info"
+              label="通知公告"
+              width="400px"
+            ></el-table-column>
           </el-table>
         </div>
         <div class="status-second">
           <!-- style="width: 100%" -->
           <el-table
-            :header-cell-style="{background:'rgba(254,223,116,50%)'}"
+            :header-cell-style="{ background: 'rgba(254,223,116,50%)' }"
             :data="tableData"
             border
             style="width: 401px"
           >
-            <el-table-column prop="info" label="通知公告" width="400px"></el-table-column>
+            <el-table-column
+              prop="info"
+              label="通知公告"
+              width="400px"
+            ></el-table-column>
           </el-table>
         </div>
       </div>
@@ -65,22 +130,30 @@
           <!-- style="width: 100%" -->
           <el-table
             :data="tableData"
-            :header-cell-style="{background:'rgba(99,211,133,50%)'}"
+            :header-cell-style="{ background: 'rgba(99,211,133,50%)' }"
             border
             style="width: 401px"
           >
-            <el-table-column prop="info" label="通知公告" width="400px"></el-table-column>
+            <el-table-column
+              prop="info"
+              label="通知公告"
+              width="400px"
+            ></el-table-column>
           </el-table>
         </div>
         <div class="status-second">
           <!-- style="width: 100%" -->
           <el-table
             :data="tableData"
-            :header-cell-style="{background:'rgba(119,201,255,50%)'}"
+            :header-cell-style="{ background: 'rgba(119,201,255,50%)' }"
             border
             style="width: 401px"
           >
-            <el-table-column prop="info" label="通知公告" width="400px"></el-table-column>
+            <el-table-column
+              prop="info"
+              label="通知公告"
+              width="400px"
+            ></el-table-column>
           </el-table>
         </div>
       </div>
@@ -91,18 +164,29 @@
 <script>
 import { mapGetters } from "vuex";
 import { getPersonalInfo, editUserInfo } from "@/api/personalCenter";
+import { getUserFlows, getFlowTemplate } from "@/api/getUserFlows";
+import store from "@/store";
 
 export default {
   data() {
     return {
+      access_token: store.getters.token,
       checked: true,
+      initDataloding: false,
+      infoData: null,
       addItemList: [
-        { itemName: "待办事项", checked: true },
-        { itemName: "通知提醒", checked: true },
-        { itemName: "我的申请", checked: false }
+        // { itemName: "待办事项", checked: true },
+        // { itemName: "通知提醒", checked: true },
+        // { itemName: "我的申请", checked: false }
+        // { itemName: "待办事项", checked: true },
+        // { itemName: "通知提醒", checked: true },
+        // { itemName: "采购", checked: true },
+        // { itemName: "报损", checked: true }
       ],
+      formList: [],
+      processDialogVisible: false,
       dialogVisible: false,
-      topContent: ["待办事项", "通知提醒"],
+      topContent: [], //"待办事项", "通知提醒", "采购", "报损"
       span: "3",
       isDisable: true,
       username: "",
@@ -137,8 +221,38 @@ export default {
   computed: {
     ...mapGetters(["name", "userID", "token"])
   },
-  created() {},
+  created() {
+    this.initDataloding = true;
+    this.initData();
+  },
   methods: {
+    fillFlowDetails(item) {
+      console.log(item);
+      console.log("---");
+      console.log(this.access_token);
+      console.log({ accessToken: this.access_token, flow_id: item });
+      console.log("===");
+      getFlowTemplate({ accessToken: this.access_token, flow_id: item }).then(
+        success => {
+          this.formList = [];
+          this.form = {};
+          console.log(success.data.template_forms);
+          for (let i of success.data.template_forms) {
+            console.log(i.field_name);
+            let tempObj = {};
+            tempObj.field_name = i.field_name;
+            tempObj.field = i.field;
+            tempObj.field_type = i.field_type;
+            this.formList.push(tempObj);
+          }
+        },
+        fail => {
+          console.log(fail);
+        }
+      );
+      this.processDialogVisible = true;
+    },
+
     addBox() {
       console.log(123);
       this.topContent.push("1");
@@ -151,26 +265,42 @@ export default {
         })
         .catch(_ => {});
     },
+    formConfirmStatus() {
+      console.log(this.form);
+      this.processDialogVisible = false;
+    },
     confirmStatus() {
       this.dialogVisible = false;
+      this.topContent = [];
       for (let i of this.addItemList) {
         if (i.checked === true) {
-          console.log(i.itemName);
-          // let item = i.itemName;
-          console.log(this.topContent);
-          // let itemList = this.topContent;
-          // console.log(itemList.indexOf(item));
-          if (this.topContent.indexOf(i.itemName) !== -1) {
-          } else {
-            this.topContent.push(i.itemName);
-          }
+          this.topContent.push(i);
         } else {
-          if (this.topContent.indexOf(i.itemName) !== -1) {
-            this.topContent.shift(i.itemName);
-          } else {
-          }
+          this.topContent = this.topContent.filter(
+            item => item.flowId !== i.flowId
+          );
         }
       }
+    },
+    initData() {
+      getUserFlows({ access_token: this.accessToken }).then(res => {
+        console.log(res);
+        this.infoData = res.data;
+        // console.log(this.infoData);
+
+        for (let i of this.infoData.flows) {
+          // console.log(i.flow_name);
+          let tempobj = {};
+          tempobj.flowName = i.flow_name;
+          tempobj.flowId = i.id;
+          tempobj.checked = true;
+          this.addItemList.push(tempobj);
+          this.topContent.push({ flowName: i.flow_name, flowId: i.id });
+        }
+
+        // this.GET_USER_FLOWS(res.data.data);
+        this.initDataloding = false;
+      });
     }
   }
 };
@@ -218,6 +348,7 @@ export default {
   background-color: #f9fafc;
 }
 .top-item {
+  cursor: pointer;
   border: 1px solid rgb(124, 184, 242);
   width: 60px;
   height: 60px;

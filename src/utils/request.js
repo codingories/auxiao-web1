@@ -3,12 +3,28 @@ import { MessageBox, Message } from "element-ui";
 import store from "@/store";
 import { removeToken } from "@/utils/auth";
 
-if (window.location.host === "mxjyey.auxiao.com") {
+// old
+// if (window.location.host === "mxjyey.auxiao.com") {
+//   axios.defaults.baseURL = "https://xjyey.auxiao.com";
+// } else {
+//   axios.defaults.baseURL = "http://47.100.124.12";
+//   // axios.defaults.baseURL = "http://47.94.237.80:805";
+// }
+
+// Api host
+if (window.location.host === "mauxiao.eaoinfo.com") {
+  // 这个是移动端
+  axios.defaults.baseURL = "https://auxiao.eaoinfo.com"; // 增加https
+} else if (window.location.host === "mxjyey.auxiao.com") {
   axios.defaults.baseURL = "https://xjyey.auxiao.com";
 } else {
-  axios.defaults.baseURL = "http://47.100.124.12";
-  // axios.defaults.baseURL = "http://47.94.237.80:805";
+  // axios.defaults.baseURL = '//47.94.237.80:805';
+  axios.defaults.baseURL = "//47.100.124.12"; // 这是测试服务器
 }
+
+// axios.defaults.baseURL = "//47.100.124.12";
+
+// axios.defaults.baseURL = "https://xjyey.auxiao.com";
 
 // create an axios instance
 const service = axios.create({
