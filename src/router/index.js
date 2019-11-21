@@ -47,15 +47,15 @@ export const constantRoutes = [
     path: "/",
     component: Layout,
     redirect: "/home",
-    // roles: ["admin", "editor"],
     children: [
       {
         path: "home",
         name: "home",
         component: () => import("@/views/home/index"),
-        meta: { title: "home", icon: "user" }
+        meta: { title: "home", icon: "user" ,roles: ['admin','editor'] },
       }
-    ]
+    ],
+    // hidden: true
     // alwaysShow: true
   },
 

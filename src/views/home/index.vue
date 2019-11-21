@@ -6,15 +6,15 @@
     <!-- <h2>{{infoData}}</h2> -->
     <el-row>
       <el-col
+        v-for="(item, i) in topContent"
+        :key="i"
         :xl="1"
         :md="1"
         :sm="1"
         :xs="1"
         class="item-marign-right"
-        v-for="(item, i) in topContent"
-        :key="i"
       >
-        <div class="top-item" @click="fillFlowDetails(item.flowId)">
+        <div class="top-item" @click="fillFlowDetails(item.flowId,item.flowName)">
           <div>{{ item.flowName }}</div>
         </div>
       </el-col>
@@ -25,7 +25,7 @@
       </el-col>
 
       <el-dialog
-        title="流程提交"
+        :title="flow_name"
         :visible.sync="processDialogVisible"
         width="30%"
         :before-close="handleClose"
@@ -34,39 +34,40 @@
           <el-checkbox v-model="item.checked">{{item.flowName}}</el-checkbox>
         </div>-->
         <el-form ref="form" :model="form" label-width="80px">
-          <h2></h2>
+
           <el-form-item label="标题(必填)">
-            <el-input v-model="form.title"></el-input>
+            <el-input v-model="form.title" />
           </el-form-item>
           <el-form-item
             v-for="(item, i) in formList"
-            :key="i"
-            :label="item.field_name"
             v-if="item.field_type === 'text'"
+            :key="i"
+            :label="item.field_name"
           >
-            <el-input v-model="form[item.field]"></el-input>
+            <el-input v-model="form[item.field]" />
           </el-form-item>
           <el-form-item
             v-for="(item, i) in formList"
+            v-if="item.field_type === 'date'"
             :key="i"
             :label="item.field_name"
-            v-if="item.field_type === 'date'"
           >
             <el-date-picker
               v-model="form[item.field]"
-              type="datetime"
+              type="dates"
               placeholder="选择日期时间"
               default-time="12:00:00"
-            >
-            </el-date-picker>
+              format="yyyy 年 MM 月 dd 日"
+              value-format="yyyy-MM-dd 00:00:00"
+            />
           </el-form-item>
           <el-form-item
             v-for="(item, i) in formList"
+            v-if="item.field_type !== 'text' && item.field_type !== 'date'"
             :key="i"
             :label="item.field_name"
-            v-if="item.field_type !== 'text' && item.field_type !== 'date'"
           >
-            <el-input v-model="form[item.field]"></el-input>
+            <el-input v-model="form[item.field]" />
           </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
@@ -106,7 +107,7 @@
               prop="info"
               label="通知公告"
               width="400px"
-            ></el-table-column>
+            />
           </el-table>
         </div>
         <div class="status-second">
@@ -121,7 +122,7 @@
               prop="info"
               label="通知公告"
               width="400px"
-            ></el-table-column>
+            />
           </el-table>
         </div>
       </div>
@@ -138,7 +139,7 @@
               prop="info"
               label="通知公告"
               width="400px"
-            ></el-table-column>
+            />
           </el-table>
         </div>
         <div class="status-second">
@@ -153,7 +154,7 @@
               prop="info"
               label="通知公告"
               width="400px"
-            ></el-table-column>
+            />
           </el-table>
         </div>
       </div>
@@ -162,14 +163,17 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
-import { getPersonalInfo, editUserInfo } from "@/api/personalCenter";
-import { getUserFlows, getFlowTemplate } from "@/api/getUserFlows";
-import store from "@/store";
+import { mapGetters } from 'vuex'
+import { getPersonalInfo, editUserInfo } from '@/api/personalCenter'
+import { getUserFlows, getFlowTemplate, createEntry } from '@/api/getUserFlows'
+import store from '@/store'
 
 export default {
+  name: 'Dashboard',
   data() {
     return {
+      flow_id: '',
+      flow_name: '',
       access_token: store.getters.token,
       checked: true,
       initDataloding: false,
@@ -186,124 +190,139 @@ export default {
       formList: [],
       processDialogVisible: false,
       dialogVisible: false,
-      topContent: [], //"待办事项", "通知提醒", "采购", "报损"
-      span: "3",
+      topContent: [], // "待办事项", "通知提醒", "采购", "报损"
+      span: '3',
       isDisable: true,
-      username: "",
-      email: "",
-      personName: "",
-      phone: "",
-      sex: "",
+      username: '',
+      email: '',
+      personName: '',
+      phone: '',
+      sex: '',
       form: {
-        name: "",
-        region: "",
-        date1: "",
-        date2: "",
-        delivery: false,
-        type: [],
-        resource: "",
-        desc: ""
+        // name: '',
+        // region: '',
+        // date1: '',
+        // date2: '',
+        // delivery: false,
+        // type: [],
+        // resource: '',
+        // desc: ''
       },
       tableData: [
         {
-          info: "[通知] xxxxxx (2019-xx-xx)"
+          info: '[通知] xxxxxx (2019-xx-xx)'
         },
         {
-          info: "[通知] xxxxxx (2019-xx-xx)"
+          info: '[通知] xxxxxx (2019-xx-xx)'
         },
         {
-          info: "[通知] xxxxxx (2019-xx-xx)"
+          info: '[通知] xxxxxx (2019-xx-xx)'
         }
       ]
-    };
+    }
   },
-  name: "dashboard",
   computed: {
-    ...mapGetters(["name", "userID", "token"])
+    ...mapGetters(['name', 'userID', 'token'])
   },
   created() {
-    this.initDataloding = true;
-    this.initData();
+    this.initDataloding = true
+    this.initData()
   },
   methods: {
-    fillFlowDetails(item) {
-      console.log(item);
-      console.log("---");
-      console.log(this.access_token);
-      console.log({ accessToken: this.access_token, flow_id: item });
-      console.log("===");
+    fillFlowDetails(item, name) {
+      console.log(item, name)
+      console.log('---')
+      console.log(this.access_token)
+      this.flow_id = item
+      this.flow_name = name
+      console.log({ accessToken: this.access_token, flow_id: item, flow_name: name})
+
+      console.log('===')
       getFlowTemplate({ accessToken: this.access_token, flow_id: item }).then(
         success => {
-          this.formList = [];
-          this.form = {};
-          console.log(success.data.template_forms);
-          for (let i of success.data.template_forms) {
-            console.log(i.field_name);
-            let tempObj = {};
-            tempObj.field_name = i.field_name;
-            tempObj.field = i.field;
-            tempObj.field_type = i.field_type;
-            this.formList.push(tempObj);
+          this.formList = []
+          this.form = {}
+          // console.log(success.data.template_forms)
+          for (const i of success.data.template_forms) {
+            console.log(i.field_name)
+            const tempObj = {}
+            tempObj.field_name = i.field_name
+            tempObj.field = i.field
+            tempObj.field_type = i.field_type
+            this.formList.push(tempObj)
           }
         },
         fail => {
-          console.log(fail);
+          console.log(fail)
         }
-      );
-      this.processDialogVisible = true;
-    },
-
-    addBox() {
-      console.log(123);
-      this.topContent.push("1");
+      )
+      this.processDialogVisible = true
     },
 
     handleClose(done) {
-      this.$confirm("确认关闭？")
+      this.$confirm('确认关闭？')
         .then(_ => {
-          done();
+          done()
         })
-        .catch(_ => {});
+        .catch(_ => {})
     },
     formConfirmStatus() {
-      console.log(this.form);
-      this.processDialogVisible = false;
+      console.log('access_token', this.access_token)
+      console.log(this.flow_id)
+      console.log(this.flow_name)
+      console.log(this.form)
+      let access_token = this.access_token;
+      let flow_id = this.flow_id;
+      let flow_name = this.flow_name;
+      let tpl = this.form
+
+      let obj = {access_token,flow_id,flow_name,tpl}
+      createEntry(obj).then(
+        success=>{
+        console.log(success)
+        this.$alert('<strong>请求成功</strong>', {
+          dangerouslyUseHTMLString: true
+        });
+      },fail=>{
+        console.log(fail)
+      })
+      this.processDialogVisible = false
     },
     confirmStatus() {
-      this.dialogVisible = false;
-      this.topContent = [];
-      for (let i of this.addItemList) {
+      this.dialogVisible = false
+      this.topContent = []
+      for (const i of this.addItemList) {
         if (i.checked === true) {
-          this.topContent.push(i);
+          this.topContent.push(i)
         } else {
           this.topContent = this.topContent.filter(
             item => item.flowId !== i.flowId
-          );
+          )
         }
       }
     },
     initData() {
       getUserFlows({ access_token: this.accessToken }).then(res => {
-        console.log(res);
-        this.infoData = res.data;
+        console.log(res)
+        this.infoData = res.data
         // console.log(this.infoData);
 
-        for (let i of this.infoData.flows) {
+        for (const i of this.infoData.flows) {
           // console.log(i.flow_name);
-          let tempobj = {};
-          tempobj.flowName = i.flow_name;
-          tempobj.flowId = i.id;
-          tempobj.checked = true;
-          this.addItemList.push(tempobj);
-          this.topContent.push({ flowName: i.flow_name, flowId: i.id });
+          const tempobj = {}
+          tempobj.flowName = i.flow_name
+          tempobj.flowId = i.id
+          tempobj.checked = true
+          this.addItemList.push(tempobj)
+          this.topContent.push({ flowName: i.flow_name, flowId: i.id })
         }
 
         // this.GET_USER_FLOWS(res.data.data);
-        this.initDataloding = false;
-      });
+        this.initDataloding = false
+      })
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>

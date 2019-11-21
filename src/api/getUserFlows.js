@@ -29,6 +29,33 @@ export function getFlowTemplate(obj) {
   });
 }
 
+
+
+export function createEntry({access_token, flow_id, flow_name, tpl}) {
+  console.log(access_token)
+  console.log(flow_id)
+  console.log(flow_name)
+  console.log(tpl)
+  let title = tpl["title"];
+  const data = new window.FormData()
+  data.append('access_token', access_token);
+  data.append('flow_id', flow_id);
+  data.append('title', title);
+  Object.keys(tpl).forEach((item) => {
+    if (item !== 'title' && item !== 'flow_name') {
+      data.append(`tpl[${item}]`, tpl[item]);
+    }
+  })
+  return request({
+    method: "post",
+    url: '/api/v1/entries',
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    },
+    data
+  });
+}
+
 // export const getFlowTemplate = ({
 //   access_token,
 //   flow_id

@@ -32,19 +32,12 @@ const actions = {
   // user login
   login({ commit }, userInfo) {
     const { account, password } = userInfo;
-    console.log("-----------------");
-    console.log("account, password");
     console.log(account, password);
 
     return new Promise((resolve, reject) => {
       login({ account: account.trim(), password: password })
         .then(response => {
           const { data } = response;
-          console.log("reponse-data");
-          console.log(typeof data);
-          console.log(data);
-          console.log("lllllllllll");
-          console.log(data.access_token);
           // commit("SET_TOKEN", data.token);
           // setToken(data.token);
           commit("SET_TOKEN", data.access_token);
