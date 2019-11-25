@@ -29,6 +29,7 @@ export function logout(data) {
   // console.log(data);
   // const data1 = new window.FormData();
   // data1.append("access_token", data);
+  // console.log("user/api下的logout," + data);
   let obj = {
     // headers: {
     //   "Content-Type": "multipart/form-data"

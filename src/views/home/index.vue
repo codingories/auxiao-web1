@@ -34,10 +34,10 @@
           <el-checkbox v-model="item.checked">{{item.flowName}}</el-checkbox>
         </div>-->
         <el-form ref="form" :model="form" label-width="80px">
-
-          <el-form-item label="标题(必填)">
+          <el-form-item label="标题*">
             <el-input v-model="form.title" />
           </el-form-item>
+
           <el-form-item
             v-for="(item, i) in formList"
             v-if="item.field_type === 'text'"
@@ -46,6 +46,7 @@
           >
             <el-input v-model="form[item.field]" />
           </el-form-item>
+
           <el-form-item
             v-for="(item, i) in formList"
             v-if="item.field_type === 'date'"
@@ -76,12 +77,7 @@
         </span>
       </el-dialog>
 
-      <el-dialog
-        title="添加流程"
-        :visible.sync="dialogVisible"
-        width="30%"
-        :before-close="handleClose"
-      >
+      <el-dialog title="添加流程" :visible.sync="dialogVisible" width="30%" :before-close="handleClose">
         <div v-for="(item, i) in addItemList" :key="i">
           <el-checkbox v-model="item.checked">{{ item.flowName }}</el-checkbox>
         </div>
@@ -103,26 +99,24 @@
             border
             style="width: 401px"
           >
-            <el-table-column
-              prop="info"
-              label="通知公告"
-              width="400px"
-            />
+            <el-table-column prop="info" label="通知公告" width="400px" />
           </el-table>
         </div>
         <div class="status-second">
           <!-- style="width: 100%" -->
           <el-table
             :header-cell-style="{ background: 'rgba(254,223,116,50%)' }"
-            :data="tableData"
+            :data="applyTable"
             border
             style="width: 401px"
+            class="mycell"
           >
-            <el-table-column
-              prop="info"
-              label="通知公告"
-              width="400px"
-            />
+            <el-table-column prop="applyInfo" label="我的申请" width="400px">
+              <template slot="header" slot-scope="{ column, $index }">
+                我的申请
+                <a class="more" @click="myApplyDetail">更多>></a>
+              </template>
+            </el-table-column>
           </el-table>
         </div>
       </div>
@@ -135,11 +129,7 @@
             border
             style="width: 401px"
           >
-            <el-table-column
-              prop="info"
-              label="通知公告"
-              width="400px"
-            />
+            <el-table-column prop="info" label="通知公告" width="400px" />
           </el-table>
         </div>
         <div class="status-second">
@@ -150,11 +140,7 @@
             border
             style="width: 401px"
           >
-            <el-table-column
-              prop="info"
-              label="通知公告"
-              width="400px"
-            />
+            <el-table-column prop="info" label="通知公告" width="400px" />
           </el-table>
         </div>
       </div>
@@ -163,166 +149,197 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import { getPersonalInfo, editUserInfo } from '@/api/personalCenter'
-import { getUserFlows, getFlowTemplate, createEntry } from '@/api/getUserFlows'
-import store from '@/store'
+import { mapGetters } from "vuex";
+import { getPersonalInfo, editUserInfo } from "@/api/personalCenter";
+import {
+  getUserFlows,
+  getFlowTemplate,
+  createEntry,
+  getEntries
+} from "@/api/getUserFlows";
+import store from "@/store";
 
 export default {
-  name: 'Dashboard',
+  name: "Dashboard",
   data() {
     return {
-      flow_id: '',
-      flow_name: '',
+      flow_id: "",
+      flow_name: "",
       access_token: store.getters.token,
       checked: true,
       initDataloding: false,
       infoData: null,
-      addItemList: [
-        // { itemName: "待办事项", checked: true },
-        // { itemName: "通知提醒", checked: true },
-        // { itemName: "我的申请", checked: false }
-        // { itemName: "待办事项", checked: true },
-        // { itemName: "通知提醒", checked: true },
-        // { itemName: "采购", checked: true },
-        // { itemName: "报损", checked: true }
-      ],
+      addItemList: [],
       formList: [],
       processDialogVisible: false,
       dialogVisible: false,
       topContent: [], // "待办事项", "通知提醒", "采购", "报损"
-      span: '3',
+      span: "3",
       isDisable: true,
-      username: '',
-      email: '',
-      personName: '',
-      phone: '',
-      sex: '',
-      form: {
-        // name: '',
-        // region: '',
-        // date1: '',
-        // date2: '',
-        // delivery: false,
-        // type: [],
-        // resource: '',
-        // desc: ''
-      },
+      username: "",
+      email: "",
+      personName: "",
+      phone: "",
+      sex: "",
+      form: {},
       tableData: [
         {
-          info: '[通知] xxxxxx (2019-xx-xx)'
+          info: "[通知] xxxxxx (2019-xx-xx)"
         },
         {
-          info: '[通知] xxxxxx (2019-xx-xx)'
+          info: "[通知] xxxxxx (2019-xx-xx)"
         },
         {
-          info: '[通知] xxxxxx (2019-xx-xx)'
+          info: "[通知] xxxxxx (2019-xx-xx)"
         }
-      ]
-    }
+      ],
+      applyTable: []
+    };
   },
   computed: {
-    ...mapGetters(['name', 'userID', 'token'])
+    ...mapGetters(["name", "userID", "token"])
   },
   created() {
-    this.initDataloding = true
-    this.initData()
+    this.initDataloding = true;
+    this.initData();
+    this.getApplies();
+    this.initDataloding = false;
   },
-  methods: {
-    fillFlowDetails(item, name) {
-      console.log(item, name)
-      console.log('---')
-      console.log(this.access_token)
-      this.flow_id = item
-      this.flow_name = name
-      console.log({ accessToken: this.access_token, flow_id: item, flow_name: name})
 
-      console.log('===')
+  methods: {
+    getApplies() {
+      getEntries({ access_token: this.access_token }).then(res => {
+        console.log("===getEntries===");
+        console.log(res.data.slice(0, 3));
+        let list = res.data.slice(0, 3);
+        let statusMap = { "0": "进行中", "9": "通过", "-1": "驳回" };
+        for (let i of list) {
+          let obj = {};
+          let tempstr = "";
+          tempstr +=
+            i.title + "-----" + statusMap[i.status] + "-----" + i.created_at;
+          obj.applyInfo = tempstr;
+          this.applyTable.push(obj);
+        }
+      });
+    },
+    clearAll() {},
+    myApplyDetail() {
+      let host = window.location.host;
+      let uri = "http://" + host + "/#/workflow/MyApplication";
+      window.location = uri;
+    },
+    fillFlowDetails(item, name) {
+      console.log(item, name);
+      console.log("---");
+      console.log(this.access_token);
+
+      this.flow_id = item;
+      this.flow_name = name;
+
+      console.log({
+        accessToken: this.access_token,
+        flow_id: item,
+        flow_name: name
+      });
+      console.log(item, this.form);
+      console.log(item.length, name.length);
+      console.log("===");
+      // if (item.length === 0 || name.length === 0) {
+      //   alert("错误");
+      // } else {
+      // }
+
       getFlowTemplate({ accessToken: this.access_token, flow_id: item }).then(
         success => {
-          this.formList = []
-          this.form = {}
+          this.formList = [];
+          this.form = {};
           // console.log(success.data.template_forms)
           for (const i of success.data.template_forms) {
-            console.log(i.field_name)
-            const tempObj = {}
-            tempObj.field_name = i.field_name
-            tempObj.field = i.field
-            tempObj.field_type = i.field_type
-            this.formList.push(tempObj)
+            const tempObj = {};
+            tempObj.field_name = i.field_name;
+            tempObj.field = i.field;
+            tempObj.field_type = i.field_type;
+            this.formList.push(tempObj);
           }
         },
         fail => {
-          console.log(fail)
+          console.log(fail);
         }
-      )
-      this.processDialogVisible = true
+      );
+
+      this.processDialogVisible = true;
     },
 
     handleClose(done) {
-      this.$confirm('确认关闭？')
+      this.$confirm("确认关闭？")
         .then(_ => {
-          done()
+          done();
         })
-        .catch(_ => {})
+        .catch(_ => {});
     },
     formConfirmStatus() {
-      console.log('access_token', this.access_token)
-      console.log(this.flow_id)
-      console.log(this.flow_name)
-      console.log(this.form)
+      console.log("access_token", this.access_token);
+      console.log(this.flow_id);
+      console.log(this.flow_name);
+      console.log(this.form);
       let access_token = this.access_token;
       let flow_id = this.flow_id;
       let flow_name = this.flow_name;
-      let tpl = this.form
-
-      let obj = {access_token,flow_id,flow_name,tpl}
-      createEntry(obj).then(
-        success=>{
-        console.log(success)
-        this.$alert('<strong>请求成功</strong>', {
+      let tpl = this.form;
+      let obj = { access_token, flow_id, flow_name, tpl };
+      if (tpl["title"].trim()) {
+        createEntry(obj).then(
+          success => {
+            console.log(success);
+            this.$alert("<strong>请求成功</strong>", {
+              dangerouslyUseHTMLString: true
+            });
+            this.applyTable = [];
+            this.getApplies();
+          },
+          fail => {
+            console.log(fail);
+          }
+        );
+      } else {
+        this.$alert("<strong>标题忘记填写了，请检查！</strong>", {
           dangerouslyUseHTMLString: true
         });
-      },fail=>{
-        console.log(fail)
-      })
-      this.processDialogVisible = false
+      }
+
+      this.processDialogVisible = false;
     },
     confirmStatus() {
-      this.dialogVisible = false
-      this.topContent = []
+      this.dialogVisible = false;
+      this.topContent = [];
       for (const i of this.addItemList) {
         if (i.checked === true) {
-          this.topContent.push(i)
+          this.topContent.push(i);
         } else {
           this.topContent = this.topContent.filter(
             item => item.flowId !== i.flowId
-          )
+          );
         }
       }
     },
     initData() {
       getUserFlows({ access_token: this.accessToken }).then(res => {
-        console.log(res)
-        this.infoData = res.data
-        // console.log(this.infoData);
-
+        this.infoData = res.data;
         for (const i of this.infoData.flows) {
-          // console.log(i.flow_name);
-          const tempobj = {}
-          tempobj.flowName = i.flow_name
-          tempobj.flowId = i.id
-          tempobj.checked = true
-          this.addItemList.push(tempobj)
-          this.topContent.push({ flowName: i.flow_name, flowId: i.id })
+          const tempobj = {};
+          tempobj.flowName = i.flow_name;
+          tempobj.flowId = i.id;
+          tempobj.checked = true;
+          this.addItemList.push(tempobj);
+          this.topContent.push({ flowName: i.flow_name, flowId: i.id });
         }
-
         // this.GET_USER_FLOWS(res.data.data);
-        this.initDataloding = false
-      })
+        this.initDataloding = false;
+      });
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -408,5 +425,9 @@ export default {
 
 .addStyle {
   cursor: pointer;
+}
+
+.more {
+  margin-left: 250px;
 }
 </style>

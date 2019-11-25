@@ -19,6 +19,9 @@ export function getUserFlows(token) {
 }
 
 export function getFlowTemplate(obj) {
+  // if (item.length === 0 || name.length === 0) {
+  //   return Error;
+  // }
   console.log(obj);
   let access_token = obj["accessToken"];
   let flow_id = obj["flow_id"];
@@ -29,30 +32,38 @@ export function getFlowTemplate(obj) {
   });
 }
 
-
-
-export function createEntry({access_token, flow_id, flow_name, tpl}) {
-  console.log(access_token)
-  console.log(flow_id)
-  console.log(flow_name)
-  console.log(tpl)
+export function createEntry({ access_token, flow_id, flow_name, tpl }) {
+  console.log(access_token);
+  console.log(flow_id);
+  console.log(flow_name);
+  console.log(tpl);
   let title = tpl["title"];
-  const data = new window.FormData()
-  data.append('access_token', access_token);
-  data.append('flow_id', flow_id);
-  data.append('title', title);
-  Object.keys(tpl).forEach((item) => {
-    if (item !== 'title' && item !== 'flow_name') {
+  const data = new window.FormData();
+  data.append("access_token", access_token);
+  data.append("flow_id", flow_id);
+  data.append("title", title);
+  Object.keys(tpl).forEach(item => {
+    if (item !== "title" && item !== "flow_name") {
       data.append(`tpl[${item}]`, tpl[item]);
     }
-  })
+  });
   return request({
     method: "post",
-    url: '/api/v1/entries',
+    url: "/api/v1/entries",
     headers: {
-      'Content-Type': 'multipart/form-data'
+      "Content-Type": "multipart/form-data"
     },
     data
+  });
+}
+
+export function getEntries({ access_token }) {
+  console.log("access_token");
+  console.log(access_token);
+  return request({
+    method: "get",
+    url: "/api/v1/entries",
+    params: { access_token }
   });
 }
 

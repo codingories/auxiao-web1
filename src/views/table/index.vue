@@ -65,14 +65,6 @@ export default {
   computed: {},
   watch: {
     choose_date(newval, oldval) {
-      console.log(12345);
-      // console.log(getDate(newval), getDate(oldval), getDate(new Date()));
-      // let newval = newval.split("-")
-      // console.log(newval[0],newval[1],newval[2])
-      // if (getDate(newval) === getDate(new Date())) {
-      //   this.tableDataDetail = [];
-      //   this.fetchMainDetail();
-      // }
       this.tableDataDetail = [];
       this.fetchMainDetail();
     }
@@ -96,8 +88,6 @@ export default {
           // 获取详细
           success => {
             let data = success.data;
-            console.log("--------data--------");
-            console.log(data);
             let tempTableDataDetail = [];
             for (let i of data) {
               let obj = {};
@@ -105,23 +95,18 @@ export default {
                 obj.ID = i.job_number;
               } else if ("workno" in i) {
                 obj.ID = i.workno;
-              }
+              } // 因为后台返回的工号信息不统一，前端通过判断来获取工号信息
               obj.name = i.name;
               obj.today_rule = i.rule_txt;
               obj.punch_record = i.kaoqin;
-              // console.log(i);
-              // console.log(i.kaoqin);
               tempTableDataDetail.push(obj);
               let rule = i.rule_txt;
               let record;
               if (i.kaoqin !== null) {
                 record = i.kaoqin.trim();
               }
-
               let day = getDate(this.choose_date);
               let status = getStatus(rule, record, day);
-              console.log(status);
-              // console.log( )
               if (status instanceof Array) {
                 obj.attendance_status = status[0];
                 if (obj.attendance_status === "迟到") {

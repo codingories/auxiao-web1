@@ -235,7 +235,7 @@ export default {
               let tempData = success.data[jobNumber[i]][innerDateKeys[j]];
               let lateTime = "";
               let leaveEarlyTime = "";
-              lateTime = tempData.late_time;
+              lateTime = Math.abs(parseInt(tempData.late_time));
               leaveEarlyTime = tempData.leave_early_time;
               let statusNumber = tempData.status;
               let status;
