@@ -16,3 +16,11 @@ export function editUserInfo(data) {
     data: qs.stringify(data)
   });
 }
+
+export function changePassword(data) {
+  return request({
+    method: "post",
+    url: "/api/v1/change/password",
+    data: qs.stringify(data)
+  });
+}

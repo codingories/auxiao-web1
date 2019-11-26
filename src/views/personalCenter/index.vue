@@ -11,22 +11,65 @@
     <!-- ref="form" :model="form" -->
     <el-form>
       <el-form-item label="账号">
-        <el-input v-model="username" :disabled="true" class="inputstyle" size="medium"></el-input>
+        <el-input
+          v-model="username"
+          :disabled="true"
+          class="inputstyle"
+          size="medium"
+        ></el-input>
       </el-form-item>
       <!-- <el-form-item label="邮箱">
         <el-input v-model="email" class="inputstyle" size="medium"></el-input>
       </el-form-item>-->
       <el-form-item label="姓名">
-        <el-input v-model="personName" :disabled="isDisable" class="inputstyle" size="medium"></el-input>
+        <el-input
+          v-model="personName"
+          :disabled="isDisable"
+          class="inputstyle"
+          size="medium"
+        ></el-input>
       </el-form-item>
       <el-form-item label="电话">
-        <el-input v-model="phone" :disabled="isDisable" class="inputstyle" size="medium"></el-input>
+        <el-input
+          v-model="phone"
+          :disabled="isDisable"
+          class="inputstyle"
+          size="medium"
+        ></el-input>
       </el-form-item>
-      <el-form-item label="密码">
-        <el-input :disabled="isDisable" class="inputstyle" size="medium"></el-input>
+      <el-form-item label="旧密码">
+        <el-input
+          type="password"
+          v-model="oldPassword"
+          :disabled="isDisable"
+          class="inputstyle"
+          size="medium"
+        ></el-input>
+      </el-form-item>
+      <el-form-item label="新密码">
+        <el-input
+          type="password"
+          v-model="newPassword"
+          :disabled="isDisable"
+          class="inputstyle"
+          size="medium"
+        ></el-input>
+      </el-form-item>
+      <el-form-item label="重复密码">
+        <el-input
+          type="password"
+          v-model="repeatPassword"
+          :disabled="isDisable"
+          class="inputstyle"
+          size="medium"
+        ></el-input>
       </el-form-item>
       <el-form-item label="微信">
-        <el-input :disabled="isDisable" class="inputstyle" size="medium"></el-input>
+        <el-input
+          :disabled="isDisable"
+          class="inputstyle"
+          size="medium"
+        ></el-input>
       </el-form-item>
       <el-form-item label="性别">
         <!-- <el-input v-model="sex" :disabled="isDisable" class="inputstyle" size="medium"></el-input> -->
@@ -38,13 +81,19 @@
     </el-form>
     <el-button type="primary" @click="changeStatus">编辑</el-button>
     <el-button type="success" @click="confirmData">确认</el-button>
+    <el-button type="warning" @click="cancelData">取消</el-button>
+
     <!-- <el-input v-model="username" class="inputstyle" placeholder="用户名" size="medium" width="200px"></el-input> -->
   </div>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
-import { getPersonalInfo, editUserInfo } from "@/api/personalCenter";
+import {
+  getPersonalInfo,
+  editUserInfo,
+  changePassword
+} from "@/api/personalCenter";
 
 export default {
   data() {
@@ -64,7 +113,10 @@ export default {
         type: [],
         resource: "",
         desc: ""
-      }
+      },
+      oldPassword: "",
+      newPassword: "",
+      repeatPassword: ""
     };
   },
   name: "dashboard",
@@ -115,6 +167,26 @@ export default {
           console.log(fail);
         }
       );
+      let obj1 = {
+        access_token: this.token,
+        old_password: this.oldPassword,
+        new_password: this.newPassword
+      };
+      if (this.repeatPassword !== this.newPassword) {
+        alert("两次密码不同");
+      } else {
+        changePassword(obj1).then(
+          resolve => {
+            alert("修改成功");
+          },
+          reject => {
+            alert("出错，请重新输入");
+          }
+        );
+      }
+    },
+    cancelData() {
+      this.isDisable = true;
     }
   }
 };

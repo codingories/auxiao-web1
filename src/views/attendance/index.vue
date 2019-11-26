@@ -202,7 +202,10 @@ export default {
           let RawData = Object.values(success.data); // 数组，日期为键的obj
           let jobNumberMapName = [];
           for (let i = 0; i < RawData.length; i++) {
-            jobNumberMapName.push(Object.values(RawData[i])[0].user.name); // 所有名字的列表
+            // console.log(Object.values(RawData[i])[0].user); // 这里数据又一个user为空
+            if (Object.values(RawData[i])[0].user) {
+              jobNumberMapName.push(Object.values(RawData[i])[0].user.name); // 所有名字的列表
+            }
           }
           let jobNumberName = {};
           jobNumber.forEach(function(element, i) {

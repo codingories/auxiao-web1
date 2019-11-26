@@ -22,7 +22,7 @@ if (window.location.host === "mauxiao.eaoinfo.com") {
   axios.defaults.baseURL = "//47.100.124.12"; // 这是测试服务器
 }
 
-// axios.defaults.baseURL = "//47.100.124.12";
+// axios.defaults.baseURL = "https://qpsdzx2.shseer.com";
 
 // axios.defaults.baseURL = "https://xjyey.auxiao.com";
 

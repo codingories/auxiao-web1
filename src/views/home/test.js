@@ -1,52 +1,91 @@
-// let a = [
-//   { flowName: "请假", flowId: 7 },
-//   { flowName: "采购", flowId: 8 },
-//   { flowName: "报损", flowId: 10 },
-//   { flowName: "看病", flowId: 11 },
-//   { flowName: "请假", flowId: 7, checked: true },
-//   { flowName: "采购", flowId: 8, checked: true },
-//   { flowName: "报损", flowId: 10, checked: true },
-//   { flowName: "看病", flowId: 11, checked: true }
-// ];
+-----BEGIN RSA PRIVATE KEY-----
+MIIEowIBAAKCAQEAuWgWoxawx4yo9yi4nwxz17e6f53LO7gc/gy7BRvvbbZK8JqI
+mReY9Q9GdhDm8UW6UrmgvdnJCur3UmD9ou1RPDPbSApcNkCrL9r0ZVdLH5qcflKO
+THtxu7iO5dz+Vl0n8NPiVOuHT38LIhA9s4ssOHs+/nrCM1r0ePbONim9X5r1AekB
+7XN41c7vbASwsK+zjKGtaVXkMsuJ/erGKBx1nnb1iFBRrMDR8lI4gZ9mjlKZnF8u
+u5uNVnvu0rCgvnRsYGO2qs/Bwiv3MNQ5kM4PWzTcCY7VLGRW+dMCmzMIspLJfwz9
+sFbuHL2PPu+ZmiqVdC6cCevWSMUomTFxrJqWQQIDAQABAoIBABpa9XzRaOe00v/v
+Re818fGkKFqjr5QZo+VpIdykD/DkjNqO3QQGGrQbK8T0uh9p7gZ8ZKEYKD/pDqcj
+KmrSmU2ZgX5IGruLjcoLsdoGAqPHcp9yVNACbDRnE8kRFQZpz5eoRvATWvSt9oMt
+E9hF3E9bFaVPBfQO5dmcG8wPOuAwBI5VUlZTtpOVJ18TxCcZe9T9mV1x+esoRxWC
+dEDSFy4B7U03LXIp4DivQVEbNsEqv7KsBCxvMAYhgTqInb5xafa9GC6GxKhL1U7h
+kzEo7Q5WsgSbqqUwDJeiJwbSSgiy8N3huiJP84G77xWjpdUW5baDvJZH35xUCjFh
+J9XtmMECgYEA8HcnQNrppaDda+pn1LCyrKSeaUCkpkddPujZVb6jxlqGTisu7mPT
+APaPxQt+53SMhtWIGdM4UwDHWyD5riF2pm/RVdt5BBR93kXeKtEqcwRl5M/bCF14
+pZbMdU+Qif/e6M8FAS4YGkshFi5Dg0/2dSLsgjwWemU0zy+WRVhvHf0CgYEAxWJd
+fXt0QZWRsY5G7KD5UbFYDvwVZSEe3t+bAi8KU5c6UW5f27f3GAfBS/2kSuEDtrxn
+4D6UydoddOp95HWp5O66o1IrrOL6HeZD7swOgBw6kOkV+kqBPjN3JS0KkGw32MA6
+VBzX5M9RfG3q+ZS1UDP65foeLtEbb8wAQ8Q/SpUCgYA2XLmjD9qCdzuXigavLsM2
+BIFLijGu5bNO5ZU8rTyZOx3hziFuA2NQdG1MPq0R5mdelCeQrw+stCBdmbbYhvgr
+6FuK7XMOWRObjHANffv6xKPEdrktyvPbe5v9aV9j01SxjRu0iJcqWpHAUfUxWoJ9
+OMf/KVZrlTW7ISb3xmZYgQKBgEFHGLgpHfeaqYZZEWesjQfRaNf70m+Rlo4K0U7V
+k8q1VtobcKRPoO5Xkju5dJ428G18vbXRvI9NDTTfYCcwKrHFqf/dawhQQHum7YyJ
++7munEfUbipKfZe+mYa38Kh2wblzSVcL+vJ3BfHqwC0uWxBdQHrSTy0YhsRgaS4A
+NxZJAoGBAIgSTlHJDNmwJQdoyoYKtXtvjSe8iMph5hGfIj+xLlssJianllnpYCrq
+bbWL51p4HciZE5Ef3HUgh5592mVpwxcLr7WzeSCck/MYupcoylVgTE6NjtgMKda5
+MbXsl4kkPj41IPGiK3xvu7BrnCjAi3DNfQGEAz/8LSyZhk8SKHtl
+-----END RSA PRIVATE KEY-----
 
-// let temp = {};
-// a = a.reduce((prev, curv) => {
-//   if (temp[curv.flowId]) {
-//   } else {
-//     temp[curv.flowId] = true;
-//     prev.push(prev);
-//   }
-//   return prev;
-// }, []);
-// console.log(a);
 
-let a = { Leave_days: "4", Leave_name: "2", Leave_reason: "3", title: "1" };
-let b = {
-  Restorder_endtime: "3",
-  Restorder_name: "2",
-  Restorder_starttime: "4",
-  title: "1"
-};
 
-console.log(a["title"]);
-console.log(b["title"]);
-for (let key in a) {
-  if (key.indexOf("name") !== -1) {
-    console.log(key);
-    if (a[key] !== "" && a[["title"]] !== "") {
-      console.log("123");
-    }
-  }
-  // console.log(key);
-}
-
-let p = 0;
-for (let key in tpl) {
-  if (key.indexOf("name") !== -1) {
-    if (tpl[key] !== "" && tpl[["title"]] !== "") {
-      p = "1";
-    }
-  }
-  // console.log(key);
-}
-console.log("p", p);
+-----BEGIN CERTIFICATE-----
+MIIFozCCBIugAwIBAgIQC9f5Hb6vLkvIGpKZbtf+WTANBgkqhkiG9w0BAQsFADBy
+MQswCQYDVQQGEwJDTjElMCMGA1UEChMcVHJ1c3RBc2lhIFRlY2hub2xvZ2llcywg
+SW5jLjEdMBsGA1UECxMURG9tYWluIFZhbGlkYXRlZCBTU0wxHTAbBgNVBAMTFFRy
+dXN0QXNpYSBUTFMgUlNBIENBMB4XDTE5MTEyNTAwMDAwMFoXDTIwMTEyNDEyMDAw
+MFowHDEaMBgGA1UEAxMRcXBzZHp4LnNoc2Vlci5jb20wggEiMA0GCSqGSIb3DQEB
+AQUAA4IBDwAwggEKAoIBAQC5aBajFrDHjKj3KLifDHPXt7p/ncs7uBz+DLsFG+9t
+tkrwmoiZF5j1D0Z2EObxRbpSuaC92ckK6vdSYP2i7VE8M9tIClw2QKsv2vRlV0sf
+mpx+Uo5Me3G7uI7l3P5WXSfw0+JU64dPfwsiED2ziyw4ez7+esIzWvR49s42Kb1f
+mvUB6QHtc3jVzu9sBLCwr7OMoa1pVeQyy4n96sYoHHWedvWIUFGswNHyUjiBn2aO
+UpmcXy67m41We+7SsKC+dGxgY7aqz8HCK/cw1DmQzg9bNNwJjtUsZFb50wKbMwiy
+ksl/DP2wVu4cvY8+75maKpV0LpwJ69ZIxSiZMXGsmpZBAgMBAAGjggKJMIIChTAf
+BgNVHSMEGDAWgBR/05nzoEcOMQBWViKOt8ye3coBijAdBgNVHQ4EFgQUXBuUGKd/
+Z2xdUtHLHS2DeTmDH8IwHAYDVR0RBBUwE4IRcXBzZHp4LnNoc2Vlci5jb20wDgYD
+VR0PAQH/BAQDAgWgMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjBMBgNV
+HSAERTBDMDcGCWCGSAGG/WwBAjAqMCgGCCsGAQUFBwIBFhxodHRwczovL3d3dy5k
+aWdpY2VydC5jb20vQ1BTMAgGBmeBDAECATCBkgYIKwYBBQUHAQEEgYUwgYIwNAYI
+KwYBBQUHMAGGKGh0dHA6Ly9zdGF0dXNlLmRpZ2l0YWxjZXJ0dmFsaWRhdGlvbi5j
+b20wSgYIKwYBBQUHMAKGPmh0dHA6Ly9jYWNlcnRzLmRpZ2l0YWxjZXJ0dmFsaWRh
+dGlvbi5jb20vVHJ1c3RBc2lhVExTUlNBQ0EuY3J0MAkGA1UdEwQCMAAwggEGBgor
+BgEEAdZ5AgQCBIH3BIH0APIAdwC72d+8H4pxtZOUI5eqkntHOFeVCqtS6BqQlmQ2
+jh7RhQAAAW6iA3qIAAAEAwBIMEYCIQDjfL3qsjb1OOM6m8ECkiv/PwUyZ5JesY4G
+G+5XF/cVqgIhANyTASNnosc/ZClFDfHbg8XfQZXUfQqMy35zO/CfPpNwAHcAXqdz
++d9WwOe1Nkh90EngMnqRmgyEoRIShBh1loFxRVgAAAFuogN6bAAABAMASDBGAiEA
+vh6gXD5pdQDTEBqMyF/s5nwPA943bKy5t4xfRgDssikCIQDd8OfMfdFOFRYIsPr1
+Y5OnhcegiAfP0FtHeySyLeA+fDANBgkqhkiG9w0BAQsFAAOCAQEAccn8CEjnJJDo
+JsifwzGr8lmQjMIiri0FEVAv8HgPfPeeKBTqqeghbJ7SH+TTigxNgtFYJPa+wE/+
+UZbyYwHgPXXoOhq5/yqTyqn6f1jbCzUhJ3zJEZmydcg2jf/BYcxMfQmeYpDLfgbm
+ss46/LjrxbF+rv8WTHw55rxipHAJtvG7ZlqVr5QATLJFKWFwCCWQVeTRGn+5PdH1
+BgZjNw0+QPd8sXyZSRqT5SdYKL2CBGT1xFcXg1H/wkeE603POYTvW6G7itW4h05/
+MOwON5/UO5N2Flx7mKfvv9dXHF5WESe4FJwQ43VuVOTWs3EObWcel8JUnZL20yoj
+NprakHKQGA==
+-----END CERTIFICATE-----
+-----BEGIN CERTIFICATE-----
+MIIErjCCA5agAwIBAgIQBYAmfwbylVM0jhwYWl7uLjANBgkqhkiG9w0BAQsFADBh
+MQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYDVQQLExB3
+d3cuZGlnaWNlcnQuY29tMSAwHgYDVQQDExdEaWdpQ2VydCBHbG9iYWwgUm9vdCBD
+QTAeFw0xNzEyMDgxMjI4MjZaFw0yNzEyMDgxMjI4MjZaMHIxCzAJBgNVBAYTAkNO
+MSUwIwYDVQQKExxUcnVzdEFzaWEgVGVjaG5vbG9naWVzLCBJbmMuMR0wGwYDVQQL
+ExREb21haW4gVmFsaWRhdGVkIFNTTDEdMBsGA1UEAxMUVHJ1c3RBc2lhIFRMUyBS
+U0EgQ0EwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCgWa9X+ph+wAm8
+Yh1Fk1MjKbQ5QwBOOKVaZR/OfCh+F6f93u7vZHGcUU/lvVGgUQnbzJhR1UV2epJa
+e+m7cxnXIKdD0/VS9btAgwJszGFvwoqXeaCqFoP71wPmXjjUwLT70+qvX4hdyYfO
+JcjeTz5QKtg8zQwxaK9x4JT9CoOmoVdVhEBAiD3DwR5fFgOHDwwGxdJWVBvktnoA
+zjdTLXDdbSVC5jZ0u8oq9BiTDv7jAlsB5F8aZgvSZDOQeFrwaOTbKWSEInEhnchK
+ZTD1dz6aBlk1xGEI5PZWAnVAba/ofH33ktymaTDsE6xRDnW97pDkimCRak6CEbfe
+3dXw6OV5AgMBAAGjggFPMIIBSzAdBgNVHQ4EFgQUf9OZ86BHDjEAVlYijrfMnt3K
+AYowHwYDVR0jBBgwFoAUA95QNVbRTLtm8KPiGxvDl7I90VUwDgYDVR0PAQH/BAQD
+AgGGMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjASBgNVHRMBAf8ECDAG
+AQH/AgEAMDQGCCsGAQUFBwEBBCgwJjAkBggrBgEFBQcwAYYYaHR0cDovL29jc3Au
+ZGlnaWNlcnQuY29tMEIGA1UdHwQ7MDkwN6A1oDOGMWh0dHA6Ly9jcmwzLmRpZ2lj
+ZXJ0LmNvbS9EaWdpQ2VydEdsb2JhbFJvb3RDQS5jcmwwTAYDVR0gBEUwQzA3Bglg
+hkgBhv1sAQIwKjAoBggrBgEFBQcCARYcaHR0cHM6Ly93d3cuZGlnaWNlcnQuY29t
+L0NQUzAIBgZngQwBAgEwDQYJKoZIhvcNAQELBQADggEBAK3dVOj5dlv4MzK2i233
+lDYvyJ3slFY2X2HKTYGte8nbK6i5/fsDImMYihAkp6VaNY/en8WZ5qcrQPVLuJrJ
+DSXT04NnMeZOQDUoj/NHAmdfCBB/h1bZ5OGK6Sf1h5Yx/5wR4f3TUoPgGlnU7EuP
+ISLNdMRiDrXntcImDAiRvkh5GJuH4YCVE6XEntqaNIgGkRwxKSgnU3Id3iuFbW9F
+UQ9Qqtb1GX91AJ7i4153TikGgYCdwYkBURD8gSVe8OAco6IfZOYt/TEwii1Ivi1C
+qnuUlWpsF1LdQNIdfbW3TSe0BhQa7ifbVIfvPWHYOu3rkg1ZeMo6XRU9B4n5VyJY
+RmE=
+-----END CERTIFICATE-----

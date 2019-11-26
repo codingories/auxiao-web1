@@ -88,7 +88,6 @@
         </span>
       </el-dialog>
     </el-row>
-
     <div class="status">
       <div class="status-first">
         <div class="status-second">
@@ -115,6 +114,12 @@
               <template slot="header" slot-scope="{ column, $index }">
                 我的申请
                 <a class="more" @click="myApplyDetail">更多>></a>
+              </template>
+              <template slot-scope="scope">
+                <div class="myApplyDetail">
+                  <div>{{scope.row["applyInfo"]}}</div>
+                  <div>{{scope.row["applyStatus"]}}</div>
+                </div>
               </template>
             </el-table-column>
           </el-table>
@@ -216,9 +221,10 @@ export default {
         for (let i of list) {
           let obj = {};
           let tempstr = "";
-          tempstr +=
-            i.title + "-----" + statusMap[i.status] + "-----" + i.created_at;
+          tempstr += i.created_at.substring(5, 10) + "|" + i.title;
           obj.applyInfo = tempstr;
+
+          obj.applyStatus = statusMap[i.status];
           this.applyTable.push(obj);
         }
       });
@@ -429,5 +435,10 @@ export default {
 
 .more {
   margin-left: 250px;
+}
+
+.myApplyDetail {
+  display: flex;
+  justify-content: space-between;
 }
 </style>
