@@ -6,7 +6,7 @@
       <el-button type="success">筛选</el-button>
       <el-button type="info">新增</el-button>
       <el-button type="warning">导出</el-button>
-      <el-table :data="tableData" style="width: 100%">
+      <el-table :data="myApplicationTable" style="width: 100%">
         <el-table-column prop="flowName" label="流程名"></el-table-column>
         <el-table-column prop="position" label="部门"></el-table-column>
         <el-table-column prop="name" label="申请人"></el-table-column>
@@ -31,7 +31,7 @@
         </el-table>
       </el-dialog>
       <el-dialog title="审批进程" :visible.sync="dialogTableVisible1">
-        <h3>标题：{{processTitle}}</h3>
+        <h3>标题：{{ processTitle }}</h3>
         <div class="block">
           <el-timeline>
             <el-timeline-item
@@ -42,7 +42,7 @@
             >
               <!-- <van-cell-group :title="'标题：' + entryDetailData.title" > -->
               <el-card>
-                <h4>{{step.process_name}}</h4>
+                <h4>{{ step.process_name }}</h4>
                 <p>
                   【当前状态】
                   <el-tag mark type="warning" v-show="step.status == '0'">进行中</el-tag>
@@ -51,16 +51,32 @@
                   <el-tag mark v-show="step.status == '-2'">已撤销</el-tag>
                   <el-tag mark v-show="step.status == '-9'">草稿</el-tag>
                 </p>
-                <p>【发起人】{{step.emp_name}}</p>
-                <p>【审核人】{{step.emp_name}}</p>
-                <p>【操作人】{{step.auditor_name ? step.auditor_name : '等待审核'}}</p>
-                <p>【批复内容】{{step.content}}</p>
-                <p>【操作时间】{{step.updated_at}}</p>
+                <p>【发起人】{{ step.emp_name }}</p>
+                <p>【审核人】{{ step.emp_name }}</p>
+                <p>
+                  【操作人】{{
+                  step.auditor_name ? step.auditor_name : "等待审核"
+                  }}
+                </p>
+                <p>【批复内容】{{ step.content }}</p>
+                <p>【操作时间】{{ step.updated_at }}</p>
               </el-card>
             </el-timeline-item>
           </el-timeline>
         </div>
       </el-dialog>
+    </div>
+    <div class="block">
+      <span class="demonstration"></span>
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="currentPage"
+        :page-sizes="[10, 20, 100]"
+        :page-size="pageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="totalTableNumber"
+      ></el-pagination>
     </div>
   </div>
 </template>
@@ -82,12 +98,20 @@ export default {
       loading: false,
       templateFormsData: [],
       processApprove: [],
-      processTitle: ""
+      processTitle: "",
+      pageSize: 10,
+      currentPage: 1,
+      myApplicationTable: []
+      // total: totalTableNumber()
     };
   },
   watch: {},
 
-  computed: {},
+  computed: {
+    totalTableNumber() {
+      return this.tableData.length;
+    }
+  },
 
   created() {
     this.initDataloding = true;
@@ -96,6 +120,20 @@ export default {
   },
 
   methods: {
+    handleSizeChange(val) {
+      this.pageSize = val;
+      this.myApplicationTable = this.tableData.slice(
+        (this.currentPage - 1) * this.pageSize,
+        this.currentPage * this.pageSize
+      );
+    },
+    handleCurrentChange(val) {
+      this.currentPage = val;
+      this.myApplicationTable = this.tableData.slice(
+        (val - 1) * this.pageSize,
+        val * this.pageSize
+      );
+    },
     getApplies() {
       getEntries({ access_token: this.access_token }).then(res => {
         // console.log(res.data.slice(0, 3));
@@ -119,6 +157,11 @@ export default {
           obj.status = statusMap[i.status];
           obj.id = i.id;
           this.tableData.push(obj);
+        }
+        if (this.tableData.length >= 10) {
+          this.myApplicationTable = this.tableData.slice(0, 10);
+        } else {
+          this.myApplicationTable = this.tableData;
         }
       });
     },
@@ -178,4 +221,3 @@ export default {
   }
 };
 </script>
-

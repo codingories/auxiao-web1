@@ -23,7 +23,6 @@
           <div>+</div>
         </div>
       </el-col>
-
       <el-dialog
         :title="flow_name"
         :visible.sync="processDialogVisible"
@@ -88,6 +87,7 @@
         </span>
       </el-dialog>
     </el-row>
+    <!-- <h1>{{applyTable}}</h1> -->
     <div class="status">
       <div class="status-first">
         <div class="status-second">
@@ -140,12 +140,24 @@
         <div class="status-second">
           <!-- style="width: 100%" -->
           <el-table
-            :data="tableData"
+            :data="myApprovalTable"
             :header-cell-style="{ background: 'rgba(119,201,255,50%)' }"
             border
             style="width: 401px"
           >
-            <el-table-column prop="info" label="通知公告" width="400px" />
+            <!-- <el-table-column prop="info" label="我的审批" width="400px" /> -->
+            <el-table-column prop="applyInfo" label="我的申请" width="400px">
+              <template slot="header" slot-scope="{ column, $index }">
+                我的审批
+                <a class="more" @click="myApprovalDetail">更多>></a>
+              </template>
+              <template slot-scope="scope">
+                <div class="myApplyDetail">
+                  <div>{{scope.row["applyInfo"]}}</div>
+                  <div>{{scope.row["applyStatus"]}}</div>
+                </div>
+              </template>
+            </el-table-column>
           </el-table>
         </div>
       </div>
@@ -160,7 +172,8 @@ import {
   getUserFlows,
   getFlowTemplate,
   createEntry,
-  getEntries
+  getEntries,
+  getUserFlowsApprovals
 } from "@/api/getUserFlows";
 import store from "@/store";
 
@@ -168,6 +181,7 @@ export default {
   name: "Dashboard",
   data() {
     return {
+      myApprovalTable: [],
       flow_id: "",
       flow_name: "",
       access_token: store.getters.token,
@@ -208,6 +222,7 @@ export default {
     this.initDataloding = true;
     this.initData();
     this.getApplies();
+    this.getApprovals();
     this.initDataloding = false;
   },
 
@@ -215,7 +230,7 @@ export default {
     getApplies() {
       getEntries({ access_token: this.access_token }).then(res => {
         console.log("===getEntries===");
-        console.log(res.data.slice(0, 3));
+        console.log(res);
         let list = res.data.slice(0, 3);
         let statusMap = { "0": "进行中", "9": "通过", "-1": "驳回" };
         for (let i of list) {
@@ -223,16 +238,36 @@ export default {
           let tempstr = "";
           tempstr += i.created_at.substring(5, 10) + "|" + i.title;
           obj.applyInfo = tempstr;
-
           obj.applyStatus = statusMap[i.status];
           this.applyTable.push(obj);
         }
+      });
+    },
+    getApprovals() {
+      getUserFlowsApprovals({ access_token: this.access_token }).then(res => {
+        console.log("getUserFlowsApprovals");
+        console.log(res.data.procs);
+        let list = res.data.procs.slice(0, 3);
+        for (let i of list) {
+          let obj = {};
+          let tempstr = "";
+          tempstr += i.updated_at.substring(5, 10) + "|" + i.entry.title;
+          obj.applyInfo = tempstr;
+        }
+        // this.initDataList = res.data.data.procs;
+        // this.GET_USER_FLOWS(res.data.data);
+        this.loading = false;
       });
     },
     clearAll() {},
     myApplyDetail() {
       let host = window.location.host;
       let uri = "http://" + host + "/#/workflow/MyApplication";
+      window.location = uri;
+    },
+    myApprovalDetail() {
+      let host = window.location.host;
+      let uri = "http://" + host + "/#/workflow/MyApproval";
       window.location = uri;
     },
     fillFlowDetails(item, name) {

@@ -6,12 +6,17 @@
     <el-button type="success" @click="nextMonth">下一月</el-button>
     <el-button type="warning" @click="exportExcel">导出</el-button>
     <!-- {{tableData}} -->
-    <el-table :data="tableData" style="width: 100%" id="out-table">
+    <el-table
+      :data="tableData"
+      height="73vh"
+      style="width: 100%"
+      id="out-table"
+    >
       <el-table-column
         :prop="tableHeader[i].prop"
         :label="tableHeader[i].label"
         min-width="150"
-        v-for="(item,i) in tableHeader"
+        v-for="(item, i) in tableHeader"
         :key="i"
       ></el-table-column>
     </el-table>
@@ -203,7 +208,7 @@ export default {
           let jobNumberMapName = [];
           for (let i = 0; i < RawData.length; i++) {
             // console.log(Object.values(RawData[i])[0].user); // 这里数据又一个user为空
-            if (Object.values(RawData[i])[0].user) {
+            if (Object.values(RawData[i])[0].user && Object.values(RawData[i])[0].user.name) {
               jobNumberMapName.push(Object.values(RawData[i])[0].user.name); // 所有名字的列表
             }
           }
@@ -308,4 +313,11 @@ export default {
   }
 };
 </script>
-
+<style scoped>
+.tableOutLayer {
+  border: 1px solid red;
+  width: 80vw;
+  height: 80vh;
+  overflow: scroll;
+}
+</style>

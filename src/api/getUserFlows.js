@@ -67,6 +67,14 @@ export function getEntries({ access_token }) {
   });
 }
 
+export function getUserFlowsApprovals({ access_token }) {
+  return request({
+    method: "get",
+    url: `/api/v1/user-flows`,
+    params: { access_token }
+  });
+}
+
 // export const getFlowTemplate = ({
 //   access_token,
 //   flow_id
