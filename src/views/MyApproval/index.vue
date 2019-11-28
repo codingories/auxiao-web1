@@ -33,9 +33,45 @@
           <el-table-column property="value" label="字段值" width="200"></el-table-column>
         </el-table>
         <h3>批复意见</h3>
-        <el-input type="textarea" :rows="2" placeholder="请输入内容" v-model="textarea" class="textarea"></el-input>
-        <el-button type="success" size="small">通过并进入下一步</el-button>
-        <el-button type="danger" size="small">驳回</el-button>
+        <el-input type="textarea" :rows="2" placeholder="请输入内容" v-model="content" class="textarea"></el-input>
+        <el-button type="success" size="small" @click="nextStep()">通过并进入下一步</el-button>
+        <el-button type="danger" size="small" @click="reject()">驳回</el-button>
+      </el-dialog>
+
+      <el-dialog title="审批进程" :visible.sync="dialogTableVisible1">
+        <h3>标题：{{ processTitle }}</h3>
+        <div class="block">
+          <el-timeline>
+            <el-timeline-item
+              timestamp
+              placement="top"
+              v-for="(step, index) in processApprove"
+              :key="index"
+            >
+              <!-- <van-cell-group :title="'标题：' + entryDetailData.title" > -->
+              <el-card>
+                <h4>{{ step.process_name }}</h4>
+                <p>
+                  【当前状态】
+                  <el-tag mark type="warning" v-show="step.status == '0'">进行中</el-tag>
+                  <el-tag mark type="success" v-show="step.status == '9'">通过</el-tag>
+                  <el-tag mark type="danger" v-show="step.status == '-1'">驳回</el-tag>
+                  <el-tag mark v-show="step.status == '-2'">已撤销</el-tag>
+                  <el-tag mark v-show="step.status == '-9'">草稿</el-tag>
+                </p>
+                <p>【发起人】{{ step.emp_name }}</p>
+                <p>【审核人】{{ step.emp_name }}</p>
+                <p>
+                  【操作人】{{
+                  step.auditor_name ? step.auditor_name : "等待审核"
+                  }}
+                </p>
+                <p>【批复内容】{{ step.content }}</p>
+                <p>【操作时间】{{ step.updated_at }}</p>
+              </el-card>
+            </el-timeline-item>
+          </el-timeline>
+        </div>
       </el-dialog>
 
       <div class="block">
@@ -55,7 +91,12 @@
 </template>
 
 <script>
-import { getUserFlowsApprovals, getEntryDetail } from "@/api/MyApproval.js";
+import {
+  getUserFlowsApprovals,
+  getEntryDetail,
+  resolvedApproval,
+  rejectedApproval
+} from "@/api/MyApproval.js";
 // import { getTotalAttendance } from "@/api/totalAttendance";
 
 import store from "@/store";
@@ -71,7 +112,10 @@ export default {
       dialogTableVisible: false,
       gridData: [],
       processTitle: "",
-      textarea: ""
+      content: "",
+      processID: "",
+      dialogTableVisible1: false,
+      processApprove: []
     };
   },
   watch: {},
@@ -86,12 +130,42 @@ export default {
     this.initDataloding = true;
     this.getApprovals();
     this.initDataloding = false;
+    this.dialogTableVisible = false;
   },
 
   methods: {
+    nextStep() {
+      let obj = {
+        access_token: this.access_token,
+        process_id: this.processID,
+        content: this.content
+      };
+      console.log(obj);
+      this.loading = true;
+      resolvedApproval(obj).then(resolve => {
+        this.$alert("通过成功");
+        this.loading = false;
+      });
+      this.dialogTableVisible = false;
+      location.reload();
+    },
+    reject() {
+      let obj = {
+        access_token: this.access_token,
+        process_id: this.processID,
+        content: this.content
+      };
+      console.log(obj);
+      this.loading = true;
+      rejectedApproval(obj).then(resolve => {
+        this.$alert("驳回成功");
+        this.loading = false;
+      });
+      this.dialogTableVisible = false;
+      location.reload();
+    },
     handleEdit(index, row) {
-      console.log(index, row);
-      console.log(row.id);
+      this.processID = row.passid;
       // console.log(this.access_token);
       console.log({
         access_token: this.access_token,
@@ -144,6 +218,7 @@ export default {
     },
     getApprovals() {
       getUserFlowsApprovals({ access_token: this.access_token }).then(res => {
+        console.log(res);
         let list = res.data.procs;
         let statusMap = {
           "0": "进行中",
@@ -169,11 +244,40 @@ export default {
           obj.createAt = i.created_at;
           obj.status = statusMap[i.status];
           obj.id = i.entry_id;
+          obj.passid = i.id;
           this.myApprovalTable.push(obj);
         }
         this.myApplicationTable = this.myApprovalTable;
         this.loading = false;
       });
+    },
+    handleProcess(index, row) {
+      console.log(index, row);
+      this.dialogTableVisible1 = true;
+      this.loading = true;
+      this.processTitle = row.title;
+      getEntryDetail({
+        access_token: this.accessToken,
+        entry_id: row.id
+      }).then(res => {
+        console.log(res);
+        // this.initEntryDetailData = res.data.entry;
+        this.processApprove = [];
+        this.gridData1 = [];
+        for (let i of res.data.procs) {
+          let obj = {};
+          obj.process_name = i.process_name;
+          obj.status = i.status;
+          obj.emp_name = i.emp_name;
+          obj.auditor_name = i.auditor_name;
+          obj.content = i.content;
+          obj.updated_at = i.updated_at;
+          this.processApprove.push(obj);
+        }
+        this.processApprove = this.processApprove.reverse();
+        this.loading = false;
+      });
+      this.loading = false;
     }
   }
 };

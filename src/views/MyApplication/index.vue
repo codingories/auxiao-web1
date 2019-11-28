@@ -20,7 +20,7 @@
               size="mini"
               @click="handleProcess(scope.$index, scope.row)"
               type="danger"
-            >审批进程</el-button>
+            >进程明细</el-button>
           </template>
         </el-table-column>
       </el-table>
