@@ -33,10 +33,6 @@ export function getFlowTemplate(obj) {
 }
 
 export function createEntry({ access_token, flow_id, flow_name, tpl }) {
-  console.log(access_token);
-  console.log(flow_id);
-  console.log(flow_name);
-  console.log(tpl);
   let title = tpl["title"];
   const data = new window.FormData();
   data.append("access_token", access_token);

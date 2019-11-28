@@ -244,18 +244,27 @@ export default {
       });
     },
     getApprovals() {
+      console.log("---------");
+      console.log({ access_token: this.access_token });
       getUserFlowsApprovals({ access_token: this.access_token }).then(res => {
         console.log("getUserFlowsApprovals");
         console.log(res.data.procs);
         let list = res.data.procs.slice(0, 3);
+        let statusMap = {
+          "0": "进行中",
+          "9": "通过",
+          "-1": "驳回",
+          "-2": "已撤销",
+          "-9": "草稿"
+        };
         for (let i of list) {
           let obj = {};
           let tempstr = "";
           tempstr += i.updated_at.substring(5, 10) + "|" + i.entry.title;
           obj.applyInfo = tempstr;
+          obj.applyStatus = statusMap[i.status];
+          this.myApprovalTable.push(obj);
         }
-        // this.initDataList = res.data.data.procs;
-        // this.GET_USER_FLOWS(res.data.data);
         this.loading = false;
       });
     },

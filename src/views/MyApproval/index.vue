@@ -6,200 +6,181 @@
       <el-button type="success">筛选</el-button>
       <el-button type="info">新增</el-button>
       <el-button type="warning">导出</el-button>
-      <el-table :data="tableData" style="width: 100%">
-        <el-table-column prop="ID" label="ID" width="180"></el-table-column>
-        <el-table-column prop="label" label="标识" width="180"></el-table-column>
-        <el-table-column prop="name" label="名称"></el-table-column>
-        <el-table-column prop="permission" label="权限"></el-table-column>
-        <el-table-column prop="createTime" label="创建时间"></el-table-column>
-        <el-table-column prop="refreshTime" label="更新时间"></el-table-column>
-        <el-table-column prop="operation" label="操作"></el-table-column>
+
+      <el-table :data="myApplicationTable" style="width: 100%">
+        <el-table-column prop="flowName" label="流程名"></el-table-column>
+        <el-table-column prop="position" label="部门"></el-table-column>
+        <el-table-column prop="name" label="申请人"></el-table-column>
+        <el-table-column prop="title" label="标题"></el-table-column>
+        <el-table-column prop="createAt" label="申请日期" width="200px"></el-table-column>
+        <el-table-column prop="status" label="状态"></el-table-column>
+        <el-table-column label="查看" width="200px">
+          <template slot-scope="scope">
+            <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">批复</el-button>
+            <el-button
+              size="mini"
+              @click="handleProcess(scope.$index, scope.row)"
+              type="danger"
+            >进程明细</el-button>
+          </template>
+        </el-table-column>
       </el-table>
+
+      <el-dialog title="批复" :visible.sync="dialogTableVisible" width="400px">
+        <h3>标题：{{ processTitle }}</h3>
+        <el-table :data="gridData" style="width: 100%">
+          <el-table-column property="name" label="字段名称" width="150"></el-table-column>
+          <el-table-column property="value" label="字段值" width="200"></el-table-column>
+        </el-table>
+        <h3>批复意见</h3>
+        <el-input type="textarea" :rows="2" placeholder="请输入内容" v-model="textarea" class="textarea"></el-input>
+        <el-button type="success" size="small">通过并进入下一步</el-button>
+        <el-button type="danger" size="small">驳回</el-button>
+      </el-dialog>
+
+      <div class="block">
+        <span class="demonstration"></span>
+        <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page="currentPage"
+          :page-sizes="[10, 20, 100]"
+          :page-size="pageSize"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="totalTableNumber"
+        ></el-pagination>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { getGroups } from "@/api/AttendanceGroup";
+import { getUserFlowsApprovals, getEntryDetail } from "@/api/MyApproval.js";
 // import { getTotalAttendance } from "@/api/totalAttendance";
-import { chooseAttendanceGroup } from "@/api/chooseAttendance";
 
 import store from "@/store";
 export default {
   data() {
     return {
       access_token: store.getters.token,
-      getGroupsLoading: false,
-      RawGroupData: [],
-      tableData: [],
-      addAttendance: [],
-      multipleSelection: []
-      // this.getRulesName() || "保底"
+      myApprovalTable: [],
+      initDataloding: false,
+      currentPage: 1,
+      pageSize: 10,
+      myApplicationTable: [],
+      dialogTableVisible: false,
+      gridData: [],
+      processTitle: "",
+      textarea: ""
     };
   },
   watch: {},
 
   computed: {
-    tableHeader: function() {
-      return this.getTableHeader(this.tableYear, this.tableMonth);
+    totalTableNumber() {
+      return this.myApprovalTable.length;
     }
   },
 
   created() {
-    this.fetchGroupData();
+    this.initDataloding = true;
+    this.getApprovals();
+    this.initDataloding = false;
   },
 
   methods: {
-    fetchGroupData() {
-      let access_token = this.access_token;
-      let access_token_obj = { access_token: this.access_token };
-      this.getGroupsLoading = true;
-      getGroups(access_token_obj).then(success => {
-        // console.log(success);
-        this.RawGroupData = success.data;
-        console.log("this.RawGroupData,this.RawGroupData");
-        console.log(this.RawGroupData);
-        console.log(typeof this.RawGroupData);
-        // this.RawRuleData = success.data[0];
-        let tempKeys0 = Object.keys(this.RawGroupData);
-        console.log(tempKeys0);
-        let dateMap = {
-          1: "星期六",
-          2: "星期日",
-          3: "星期一",
-          4: "星期二",
-          5: "星期三",
-          6: "星期四",
-          7: "星期五"
-        };
-        let finalList = [];
-        let index = 1;
-        let AddAttendanceObjList = [];
-        for (let i of tempKeys0) {
-          let finalObj = { ID: "", ruleName: "", content: "" };
-          let str = "";
-          finalObj.ruleName = this.RawGroupData[i].rule.name;
-          console.log(this.RawGroupData[i].users);
-          // console.log(
-          //   Object.prototype.toString.call(this.RawGroupData[i].users)
-          // );
-
-          let nameMap = { "2": "在编", "3": "非编" };
-          if (this.RawGroupData[i].users !== null) {
-            for (let k of this.RawGroupData[i].users) {
-              let AddAttendanceObj = {};
-              AddAttendanceObj.id = k.workno; // id改成
-              AddAttendanceObj.name = k.name;
-              AddAttendanceObj.attendance_group_id =
-                nameMap[k.attendance_group_id];
-              console.log("AddAttendanceObjAddAttendanceObjAddAttendanceObj");
-              console.log(AddAttendanceObj);
-              AddAttendanceObjList.push(AddAttendanceObj);
-            }
-            this.addAttendance = AddAttendanceObjList;
-          }
-
-          let tempKeys1 = Object.keys(this.RawGroupData[i].rule.items);
-          let tempObj1 = {};
-          let tempObj2 = {};
-          for (let j of tempKeys1) {
-            console.log("-------");
-            // console.log(this.RawGroupData[i].rule.items[j].day);
-            // console.log(this.RawGroupData[i].rule.items[j].end_time);
-            // console.log(this.RawGroupData[i].rule.items[j].start_time);
-            let tempStrKey = "";
-            tempStrKey +=
-              this.RawGroupData[i].rule.items[j].start_time +
-              "-" +
-              this.RawGroupData[i].rule.items[j].end_time;
-            tempObj1[
-              dateMap[this.RawGroupData[i].rule.items[j].day]
-            ] = tempStrKey;
-            tempObj2[tempStrKey] = "";
-
-            // let tempKeys2 = Object.keys(this.RawGroupData[i].rule.items[j]);
-            // for (let k of tempKeys2) {
-            //   console.log(k);
-            // }
-          }
-          for (let i of Object.keys(tempObj2)) {
-            for (let j of Object.keys(tempObj1)) {
-              if (tempObj1[j] === i) {
-                tempObj2[i] += j + ",";
-              }
-            }
-          }
-          for (let k in tempObj2) {
-            let value = tempObj2[k];
-            tempObj2[value] = k;
-            delete tempObj2[k];
-          }
-          let tempObj3 = Object.keys(tempObj2);
-          for (let i of tempObj3) {
-            str += i + tempObj2[i] + ";";
-          }
-          finalObj.content = str;
-          finalObj.ID = index;
-          finalList.push(finalObj);
-
-          index++;
-          console.log(finalObj);
-        }
-        this.tableData = finalList;
-      });
-
-      this.getGroupsLoading = false;
-    },
-
-    chooseAttendance(arg) {
-      console.log(arg);
-      console.log("------");
-      let temp_obj = {
+    handleEdit(index, row) {
+      console.log(index, row);
+      console.log(row.id);
+      // console.log(this.access_token);
+      console.log({
         access_token: this.access_token,
-        attendance_group_id: "",
-        user_ids: ""
-      };
-      let user_id_list = [];
-      console.log(this.multipleSelection);
-      for (let i of this.multipleSelection) {
-        console.log(i.id);
-        user_id_list.push(i.id);
-        for (let k of this.addAttendance) {
-          // console.log(k);
-          if (k.id === i.id) {
-            // user_id += k.id;
-            if (arg === 3) {
-              temp_obj.attendance_group_id = arg;
-              k.attendance_group_id = "非编";
-            } else {
-              temp_obj.attendance_group_id = arg;
-              k.attendance_group_id = "在编";
-            }
-          }
-        }
-        console.log(user_id_list);
-        let user_id = user_id_list.join(",");
-        // console.log(user_id);
-        temp_obj.user_ids = user_id;
-
-        // if (arg === 3) {
-        //   this.addAttendance[i.id - 1].attendance_group_id = "非编";
-        // } else if (arg === 2) {
-        //   this.addAttendance[i.id - 1].attendance_group_id = "在编";
+        entry_id: row.id
+      });
+      this.dialogTableVisible = true;
+      this.loading = true;
+      getEntryDetail({
+        access_token: this.access_token,
+        entry_id: row.id
+      }).then(res => {
+        this.processTitle = row.title;
+        console.log(res);
+        // // this.initEntryDetailData = res.data.entry;
+        // this.templateFormsData = [];
+        // this.templateFormsData = res.data.template_forms;
+        // this.gridData = [];
+        // for (let i of this.templateFormsData) {
+        //   let obj = {};
+        //   obj.name = i.field_name;
+        //   obj.value = i.field_value;
+        //   this.gridData.push(obj);
         // }
-      }
-      console.log(temp_obj);
-      if (temp_obj.attendance_group_id === "" || temp_obj.user_ids === "") {
-        return;
-      } else {
-        chooseAttendanceGroup(temp_obj);
-      }
+        // this.loading = false;
+        this.templateFormsData = [];
+        this.templateFormsData = res.data.template_forms;
+        this.gridData = [];
+        for (let i of this.templateFormsData) {
+          let obj = {};
+          obj.name = i.field_name;
+          obj.value = i.field_value;
+          this.gridData.push(obj);
+        }
+        this.loading = false;
+      });
     },
-    handleSelectionChange(val) {
-      console.log(val);
-      this.multipleSelection = val;
+    handleSizeChange(val) {
+      this.pageSize = val;
+      this.myApplicationTable = this.myApprovalTable.slice(
+        (this.currentPage - 1) * this.pageSize,
+        this.currentPage * this.pageSize
+      );
+    },
+    handleCurrentChange(val) {
+      this.currentPage = val;
+      this.myApplicationTable = this.myApprovalTable.slice(
+        (val - 1) * this.pageSize,
+        val * this.pageSize
+      );
+    },
+    getApprovals() {
+      getUserFlowsApprovals({ access_token: this.access_token }).then(res => {
+        let list = res.data.procs;
+        let statusMap = {
+          "0": "进行中",
+          "9": "通过",
+          "-1": "驳回",
+          "-2": "已撤销",
+          "-9": "草稿"
+        };
+        for (let i of list) {
+          let obj = {
+            flowName: "",
+            position: "",
+            name: "",
+            title: "",
+            createAt: "",
+            status: ""
+          };
+
+          obj.flowName = i.flow.flow_name;
+          obj.position = i.entry.emp.position;
+          obj.name = i.entry.emp.name;
+          obj.title = i.entry.title;
+          obj.createAt = i.created_at;
+          obj.status = statusMap[i.status];
+          obj.id = i.entry_id;
+          this.myApprovalTable.push(obj);
+        }
+        this.myApplicationTable = this.myApprovalTable;
+        this.loading = false;
+      });
     }
   }
 };
 </script>
 
+<style  scoped>
+.textarea {
+  margin-bottom: 20px;
+}
+</style>
