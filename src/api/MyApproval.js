@@ -29,3 +29,10 @@ export const rejectedApproval = ({ access_token, process_id, content }) =>
     url: "/api/v1/proc/unpass",
     data: qs.stringify({ access_token, process_id, content })
   });
+
+export const getUserFlows = ({access_token}) =>
+  request({
+    method: 'get',
+    url: `/api/v1/user-flows`,
+    params: {access_token}
+  });
