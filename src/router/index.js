@@ -79,19 +79,19 @@ export const asyncRoutes = [
     component: Layout,
     redirect: '/attendance/table',
     name: 'attendance',
-    meta: { title: '考勤管理', icon: 'example', roles: ['admin', 'editor']},
+    meta: { title: '考勤管理', icon: 'example', roles: ['admin']},
     children: [
       {
         path: 'table',
         name: 'Table',
         component: () => import('@/views/table/index'),
-        meta: { title: '每日考勤', icon: 'table' ,roles: ['admin', 'editor'] }
+        meta: { title: '每日考勤', icon: 'table' ,roles: ['admin'] }
       },
       {
         path: 'TotalAttendance',
         name: 'TotalAttendance',
         component: () => import('@/views/attendance/index'),
-        meta: { title: '考勤汇总', icon: 'tree' ,roles: ['admin', 'editor']}
+        meta: { title: '考勤汇总', icon: 'tree' ,roles: ['admin']}
       },
       {
         path: 'AttendanceGroup',
@@ -121,7 +121,7 @@ export const asyncRoutes = [
         path: 'index',
         name: 'Form',
         component: () => import('@/views/form/index'),
-        meta: { title: '物品管理', icon: 'form', roles: ['admin', 'editor']}
+        meta: { title: '物品管理', icon: 'form', roles: ['admin']}
       }
     ]
   },

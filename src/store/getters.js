@@ -4,6 +4,8 @@ const getters = {
   token: state => state.user.token,
   avatar: state => state.user.avatar,
   name: state => state.user.name,
-  userID: state => state.user1
-};
-export default getters;
+  userID: state => state.user1,
+  permission_routes: state => state.permission.routes
+
+}
+export default getters

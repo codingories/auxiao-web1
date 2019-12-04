@@ -36,7 +36,7 @@ router.beforeEach(async(to, from, next) => {
         next();
       } else {
         try {
-          const roles = ['admin']
+          const roles = ['editor']
           store.getters.roles = roles
           const accessRoutes = await store.dispatch('permission/generateRoutes', roles)
           console.log("--accessRoutes--",accessRoutes)
