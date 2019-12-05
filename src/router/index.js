@@ -210,6 +210,12 @@ export const asyncRoutes = [
         name: 'RoleManagement',
         component: () => import('@/views/RoleManagement/index'),
         meta: { title: '角色管理', icon: 'link' }
+      },
+      {
+        path: 'AddMenu',
+        name: 'AddMenu',
+        component: () => import('@/views/AddMenu/index'),
+        meta: { title: '增加菜单', icon: 'link' }
       }
     ]
   },
