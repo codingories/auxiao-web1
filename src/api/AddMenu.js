@@ -9,6 +9,14 @@ export function getMenuList(params) {
   })
 }
 
+export function getMenus(params) {
+  return request({
+    url: '/api/v1/admin-menu/index',
+    method: 'get',
+    params
+  })
+}
+
 export function saveMenu(info) {
   const data = new window.FormData()
   info['access_token'] && data.append('access_token', info['access_token'])
