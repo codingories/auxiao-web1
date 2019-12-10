@@ -26,6 +26,8 @@ export function saveMenu(info) {
   info['title'] && data.append('title', info['title'])
   info['method'] && data.append('method', info['method'])
   info['uri'] && data.append('uri', info['uri'])
+  info['icon'] && data.append('uri', info['icon'])
+  info['remark'] && data.append('uri', info['remark'])
 
   return request({
     url: '/api/v1/admin-menu/save',
