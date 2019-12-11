@@ -8,3 +8,11 @@ export function getRoles(params) {
     params
   })
 }
+
+export function getTotalMenuList(params) {
+  return request({
+    url: '/api/v1/admin-menu/index',
+    method: 'get',
+    params
+  })
+}
