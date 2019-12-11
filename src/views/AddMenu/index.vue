@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <!--{{editTable}}-->
-
+<!--{{idLayer}}-->
     <el-table
       :data="menuTable"
       style="width: 100%;margin-bottom: 20px;"
@@ -43,7 +43,7 @@
           <el-button
             size="mini"
             type="success"
-            @click="handleDelete(scope.$index, scope.row)"
+            @click="EditMenu(scope.$index, scope.row)"
           >编辑</el-button>
           <el-button
             size="mini"
@@ -94,7 +94,7 @@
           width="180"
         >
           <template slot-scope="scope">
-            <el-input v-model="editTable[0].menuName">123</el-input>
+            <el-input v-model="editTable[0].menuName" />
           </template>
         </el-table-column>
         <el-table-column
@@ -111,15 +111,7 @@
           label="icon"
         >
           <template slot-scope="scope">
-            <!--<el-input v-model="editTable[0].icon" />-->
-            <!--<el-dropdown-menu slot="dropdown">-->
-            <!--<el-dropdown-item icon="el-icon-plus">黄金糕</el-dropdown-item>-->
-            <!--<el-dropdown-item icon="el-icon-circle-plus">狮子头</el-dropdown-item>-->
-            <!--<el-dropdown-item icon="el-icon-circle-plus-outline">螺蛳粉</el-dropdown-item>-->
-            <!--<el-dropdown-item icon="el-icon-check">双皮奶</el-dropdown-item>-->
-            <!--<el-dropdown-item icon="el-icon-circle-check">蚵仔煎</el-dropdown-item>-->
-            <!--</el-dropdown-menu>-->
-            <el-select v-model="value1" placeholder="请选择">
+            <el-select v-model="editTable[0].icon" placeholder="请选择">
               <el-option
                 v-for="item in options1"
                 :key="item.value"
@@ -132,9 +124,6 @@
                     <use :xlink:href="'#'+item.icon" />
                   </svg>
                 </span>
-                <!--<span style="float: right; color: #8492a6; font-size: 13px; line-height:34px" :class="item.icon" />-->
-                <!--<svg aria-hidden="true" class="svg-icon"><use  href="#icon-tree"></use></svg>-->
-
               </el-option>
             </el-select>
           </template>
@@ -154,6 +143,19 @@
         <el-button type="primary" @click="confirmAdd">确 定</el-button>
       </span>
     </el-dialog>
+    <el-dialog
+      title="修改菜单"
+      :visible.sync="EditVisible"
+      width="30%"
+      :before-close="handleClose"
+    >
+      <el-form ref="form" :model="form" label-width="80px">
+        <el-form-item label="活动名称">
+          <el-input v-model="form.name"></el-input>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -196,7 +198,7 @@ export default {
         value: 'nested',
         label: 'nested',
         icon: 'el-nested'
-      },{
+      }, {
         value: 'password',
         label: 'password',
         icon: 'el-password'
@@ -237,11 +239,14 @@ export default {
         method: ''
       },
       access_token: store.getters.token,
-      dialogVisible: false
+      dialogVisible: false,
+      EditVisible: false,
+      idLayer: []
     }
   },
 
   computed: {
+
   },
   watch: {},
 
@@ -250,6 +255,10 @@ export default {
   },
 
   methods: {
+    EditMenu(index, row) {
+      console.log(index, row)
+      this.EditVisible = true;
+    },
     handleClose(done) {
       this.$confirm('确认关闭？')
         .then(_ => {
@@ -316,11 +325,21 @@ export default {
         res => {
           // console.log(res.data)
           this.menuTable = res.data
+          for (const i of this.menuTable) {
+            const str = i.id + '-0'
+            this.idLayer.push(str)
+            for (const j of i.children) {
+              console.log(j.id)
+              this.idLayer.push(i.id + '-' + j.id)
+            }
+          }
         }
       )
     },
     addMenus(index, row) {
+      console.log('aaaaa')
       console.log(index, row)
+      console.log('bbbbb')
       this.dialogVisible = true
     },
     cancelAdd() {
@@ -347,12 +366,14 @@ export default {
     confirmAdd() {
       this.$confirm('确认增加？')
         .then(_ => {
-          this.dialogVisible = false
+          console.log('------')
           console.log(this.editTable)
-          this.editTable[0].menuName = ''
-          this.editTable[0].link = ''
-          this.editTable[0].icon = ''
-          this.editTable[0].remark = ''
+          console.log(this.editTable[0])
+          // this.editTable[0].menuName = ''
+          // this.editTable[0].link = ''
+          // this.editTable[0].icon = ''
+          // this.editTable[0].remark = ''
+          this.dialogVisible = false
         })
         .catch(_ => {
           this.editTable[0].menuName = ''
