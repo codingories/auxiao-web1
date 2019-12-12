@@ -66,7 +66,6 @@ module.exports = {
       }
     }
   },
-  // filenameHashing: true,
   chainWebpack(config) {
     let flag = Math.random().toString()
 
