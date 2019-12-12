@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <h2>角色管理</h2>
-    <el-table ref="multipleTable" :data="roleTable" style="width: 100%">
+    <el-table ref="multipleTable" :data="roleTable" style="width: 100%" @selection-change="handleSelection">
       <el-table-column prop="choose" label="选择" type="selection" />
       <el-table-column prop="id" label="序号" width="180" />
       <el-table-column prop="name" label="角色名" width="180" />
@@ -15,7 +15,13 @@
           />
         </template>
       </el-table-column>
-      <el-table-column prop="assignUser" label="分配用户" />
+      <el-table-column prop="assignUser" label="分配用户">
+        <template slot-scope="scope">
+          <div class="authorizeUser" @click="assignment(scope.$index, scope.row)">
+            &nbsp{{ scope.row.assignUser }}
+          </div>
+        </template>
+      </el-table-column>
       <el-table-column prop="operation" label="操作">
         <template slot-scope="scope">
           <el-button type="warning" size="mini" @click="authorize(scope.$index, scope.row)">授权</el-button>
@@ -23,7 +29,7 @@
       </el-table-column>
     </el-table>
     <el-button type="primary">新增</el-button>
-    <el-button type="success">编辑</el-button>
+    <el-button type="success" @click="editRoles">编辑</el-button>
     <el-button type="info">删除</el-button>
     <el-dialog
       title="菜单列表"
@@ -46,17 +52,117 @@
       <el-button type="primary" @click="confirmAuthorizeTable">确认</el-button>
     </el-dialog>
 
+    <el-dialog
+      title="分配用户"
+      :visible.sync="alignUserShow"
+      width="30%"
+      :before-close="handleClose"
+    >
+      <div class="treeContainer">
+        <el-tree
+          ref="alignTree"
+          :data="alignUserTable"
+          show-checkbox
+          default-expand-all
+          node-key="id"
+          highlight-current
+          :props="defaultProps"
+        />
+      </div>
+      <el-button type="success" @click="cancelAlignUserTable">取消</el-button>
+      <el-button type="primary" @click="confirmAlignUserTable">确认</el-button>
+    </el-dialog>
+    <el-dialog
+      title="编辑角色"
+      :visible.sync="editRolesShow"
+      width="30%"
+      :before-close="handleClose"
+    >
+
+      <el-form ref="form" :model="editForm" label-width="80px">
+        <el-form-item label="角色名">
+          <el-input v-model="editForm.roleName" />
+        </el-form-item>
+      </el-form>
+      <!--<el-button type="success" @click="cancelAlignUserTable">取消</el-button>-->
+      <!--<el-button type="primary" @click="confirmAlignUserTable">确认</el-button>-->
+      <el-button type="success" @click="cancelEditRoles">取消</el-button>
+      <el-button type="primary" @click="confirmEditRoles">确认</el-button>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { getRoles, getTotalMenuList, authorizeRoles } from '@/api/RoleManagement.js'
-import { chooseAttendanceGroup } from '@/api/chooseAttendance'
 
 import store from '@/store'
 export default {
   data() {
     return {
+      editForm: { roleName: '' },
+      editRolesShow: false,
+      alignUserTable: [{
+        id: 1,
+        title: '工程部',
+        children: [{
+          id: 4,
+          title: '周杰伦'
+        }, {
+          id: 5,
+          title: '江泽民'
+        }, {
+          id: 6,
+          title: '邓小平'
+        }]
+      }, {
+        id: 11,
+        title: '教研部',
+        children: [{
+          id: 7,
+          title: '奥巴马'
+        }, {
+          id: 8,
+          title: '习近平'
+        }, {
+          id: 9,
+          title: '周星驰'
+        }]
+      }, {
+        id: 10,
+        title: '售后部',
+        children: [{
+          id: 11,
+          title: '姚明'
+        }, {
+          id: 12,
+          title: '刘翔'
+        }, {
+          id: 13,
+          title: '孙悟空'
+        }, {
+          id: 14,
+          title: '漩涡鸣人'
+        }, {
+          id: 15,
+          title: '路飞'
+        }]
+      },
+      {
+        id: 31,
+        title: '客服部',
+        children: [{
+          id: 24,
+          title: '迪丽热巴'
+        }, {
+          id: 25,
+          title: '莫妮卡'
+        }, {
+          id: 27,
+          title: '米歇尔'
+        }]
+      }
+      ],
+      alignUserShow: false,
       authorizeTableVisible: false,
       defaultProps: {
         children: 'children',
@@ -105,7 +211,10 @@ export default {
       addAttendance: [],
       multipleSelection: [],
       rowId: '',
-      rowName: ''
+      rowName: '',
+      alignIndex: '',
+      alignRow: '',
+      checkedList: []
     }
   },
 
@@ -122,10 +231,28 @@ export default {
   },
 
   methods: {
+    handleSelection(val) {
+      this.checkedList = val
+    },
+    editRoles() {
+      if (this.checkedList.length === 0) {
+        this.$alert('未勾选，请选择一个选项')
+      } else if (this.checkedList.length >= 2) {
+        this.$alert('只能选择一个选项')
+      } else {
+        const obj = {
+          access_token: this.access_token,
+          id: this.checkedList[0].id,
+          name: this.checkedList[0].name,
+          menus: [25, 27]
+        }
+        this.editRolesShow = true
+        console.log(obj)
+      }
+    },
     confirmAuthorizeTable(done) {
       this.$confirm('确认提交？')
         .then(_ => {
-          console.log('aaaaa')
           const menus = this.$refs.tree.getCheckedKeys().map(function(x) {
             return parseInt(x)
           })
@@ -137,8 +264,8 @@ export default {
             menus: menus
           }
           console.log(obj)
-          authorizeRoles(obj).then(res=>{
-            this.$alert("授权成功!")
+          authorizeRoles(obj).then(res => {
+            this.$alert('授权成功!')
           })
           this.authorizeTableVisible = false
         })
@@ -187,6 +314,59 @@ export default {
           this.roleTable.push(obj)
         }
       })
+    },
+    // 分配用户模块
+    assignment(index, row) {
+      console.log(index, row)
+      this.alignIndex = index
+      this.alignRow = row
+      this.alignUserShow = true
+
+      // this.$set(this.menuTable, index0, tempTable)
+    },
+    cancelAlignUserTable() {
+      this.$confirm('确认取消？')
+        .then(_ => {
+          this.alignUserShow = false
+        })
+        .catch(_ => {})
+    },
+    confirmAlignUserTable() {
+      this.$confirm('确认提交？')
+        .then(_ => {
+          const menus = this.$refs.alignTree.getCheckedNodes()
+          let str = ''
+          const section = { '工程部': '', '教研部': '', '售后部': '', '客服部': '' }
+          for (const i of menus) {
+            if (i.title in section) {
+            } else {
+              str += i.title + ','
+            }
+          }
+
+          console.log('===menus===')
+          console.log(str)
+          console.log(this.alignIndex, this.alignRow)
+          this.alignRow['assignUser'] = str
+          this.$set(this.roleTable, this.alignIndex, this.alignRow)
+          this.alignUserShow = false
+          this.$refs.alignTree.setCheckedKeys([])
+        })
+        .catch(_ => {})
+    },
+    cancelEditRoles() {
+      this.$confirm('确认取消？')
+        .then(_ => {
+          this.editRolesShow = false
+        })
+        .catch(_ => {})
+    },
+    confirmEditRoles() {
+      this.$confirm('确认提交？')
+        .then(_ => {
+          this.editRolesShow = false
+        })
+        .catch(_ => {})
     }
   }
 }
@@ -196,5 +376,8 @@ export default {
   .treeContainer {
     height: 450px;
     overflow-y: scroll;
+  }
+  .authorizeUser {
+    cursor: pointer;
   }
 </style>
