@@ -18,7 +18,7 @@
       <el-table-column prop="assignUser" label="分配用户" />
       <el-table-column prop="operation" label="操作">
         <template slot-scope="scope">
-          <el-button type="warning" size="mini" @click="authorize">授权</el-button>
+          <el-button type="warning" size="mini" @click="authorize(scope.$index, scope.row)">授权</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import { getRoles, getTotalMenuList } from '@/api/RoleManagement.js'
+import { getRoles, getTotalMenuList, authorizeRoles } from '@/api/RoleManagement.js'
 import { chooseAttendanceGroup } from '@/api/chooseAttendance'
 
 import store from '@/store'
@@ -103,7 +103,9 @@ export default {
       RawGroupData: [],
       roleTable: [],
       addAttendance: [],
-      multipleSelection: []
+      multipleSelection: [],
+      rowId: '',
+      rowName: ''
     }
   },
 
@@ -123,6 +125,21 @@ export default {
     confirmAuthorizeTable(done) {
       this.$confirm('确认提交？')
         .then(_ => {
+          console.log('aaaaa')
+          const menus = this.$refs.tree.getCheckedKeys().map(function(x) {
+            return parseInt(x)
+          })
+          // let token = this.access_token
+          const obj = {
+            access_token: this.access_token,
+            id: this.rowId,
+            name: this.rowName,
+            menus: menus
+          }
+          console.log(obj)
+          authorizeRoles(obj).then(res=>{
+            this.$alert("授权成功!")
+          })
           this.authorizeTableVisible = false
         })
         .catch(_ => {})
@@ -145,16 +162,13 @@ export default {
       const access_token = this.access_token
       const access_token_obj = { access_token: this.access_token }
       getTotalMenuList(access_token_obj).then(res => {
-
-        // for (let i = 0; i < res.data.length; i++) {
-        //
-        // }
-
         this.authorizeTable = res.data
       })
     },
-    authorize() {
+    authorize(index, row) {
       this.authorizeTableVisible = true
+      this.rowId = row.id
+      this.rowName = row.name
     },
     handleEdit(a, b) {
       console.log(a, b)
