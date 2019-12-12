@@ -48,7 +48,7 @@
           :props="defaultProps"
         />
       </div>
-      <el-button type="success" @click="cancelAuthorizeTable">取消</el-button>
+      <el-button type="success" @click="cancelDiag('authorizeTableVisible')">取消</el-button>
       <el-button type="primary" @click="confirmAuthorizeTable">确认</el-button>
     </el-dialog>
 
@@ -69,7 +69,7 @@
           :props="defaultProps"
         />
       </div>
-      <el-button type="success" @click="cancelAlignUserTable">取消</el-button>
+      <el-button type="success" @click="cancelDiag('alignUserShow')">取消</el-button>
       <el-button type="primary" @click="confirmAlignUserTable">确认</el-button>
     </el-dialog>
     <el-dialog
@@ -84,9 +84,7 @@
           <el-input v-model="editForm.roleName" />
         </el-form-item>
       </el-form>
-      <!--<el-button type="success" @click="cancelAlignUserTable">取消</el-button>-->
-      <!--<el-button type="primary" @click="confirmAlignUserTable">确认</el-button>-->
-      <el-button type="success" @click="cancelEditRoles">取消</el-button>
+      <el-button type="success" @click="cancelDiag('editRolesShow')">取消</el-button>
       <el-button type="primary" @click="confirmEditRoles">确认</el-button>
     </el-dialog>
   </div>
@@ -234,11 +232,13 @@ export default {
     handleSelection(val) {
       this.checkedList = val
     },
+
+    // 以下是编辑按钮
     editRoles() {
       if (this.checkedList.length === 0) {
-        this.$alert('未勾选，请选择一个选项')
+        this.$alert('未勾选，请选择一个选项').then(() => {}).catch(() => {})
       } else if (this.checkedList.length >= 2) {
-        this.$alert('只能选择一个选项')
+        this.$alert('只能选择一个选项').then(() => {}).catch(() => {})
       } else {
         const obj = {
           access_token: this.access_token,
@@ -246,35 +246,53 @@ export default {
           name: this.checkedList[0].name,
           menus: [25, 27]
         }
+        this.sendRolesObj = obj
         this.editRolesShow = true
-        console.log(obj)
       }
     },
+    confirmEditRoles() {
+      this.$confirm('确认提交？')
+        .then(_ => {
+          if (!this.editForm.roleName) {
+            this.$alert('名字不能为空!')
+            return
+          }
+          this.sendRolesObj.name = this.editForm.roleName
+          const obj = this.sendRolesObj
+          this.checkedList[0].name = this.editForm.roleName
+          authorizeRoles(obj).then(res => {
+            this.$alert('编辑成功!')
+            this.$set(this.roleTable, this.checkedList[0].id - 1, this.checkedList[0])
+          })
+        })
+        .catch(_ => {})
+      this.editRolesShow = false
+    },
+    // 以上是编辑按钮
     confirmAuthorizeTable(done) {
       this.$confirm('确认提交？')
         .then(_ => {
           const menus = this.$refs.tree.getCheckedKeys().map(function(x) {
             return parseInt(x)
           })
-          // let token = this.access_token
           const obj = {
             access_token: this.access_token,
             id: this.rowId,
             name: this.rowName,
             menus: menus
           }
-          console.log(obj)
           authorizeRoles(obj).then(res => {
+            console.log(obj)
             this.$alert('授权成功!')
           })
           this.authorizeTableVisible = false
         })
         .catch(_ => {})
     },
-    cancelAuthorizeTable(done) {
+    cancelDiag(attr) {
       this.$confirm('确认取消？')
         .then(_ => {
-          this.authorizeTableVisible = false
+          this[attr] = false
         })
         .catch(_ => {})
     },
@@ -297,9 +315,6 @@ export default {
       this.rowId = row.id
       this.rowName = row.name
     },
-    handleEdit(a, b) {
-      console.log(a, b)
-    },
     fetchRoleData() {
       const access_token = this.access_token
       const access_token_obj = { access_token: this.access_token }
@@ -321,15 +336,6 @@ export default {
       this.alignIndex = index
       this.alignRow = row
       this.alignUserShow = true
-
-      // this.$set(this.menuTable, index0, tempTable)
-    },
-    cancelAlignUserTable() {
-      this.$confirm('确认取消？')
-        .then(_ => {
-          this.alignUserShow = false
-        })
-        .catch(_ => {})
     },
     confirmAlignUserTable() {
       this.$confirm('确认提交？')
@@ -343,28 +349,10 @@ export default {
               str += i.title + ','
             }
           }
-
-          console.log('===menus===')
-          console.log(str)
-          console.log(this.alignIndex, this.alignRow)
           this.alignRow['assignUser'] = str
           this.$set(this.roleTable, this.alignIndex, this.alignRow)
           this.alignUserShow = false
           this.$refs.alignTree.setCheckedKeys([])
-        })
-        .catch(_ => {})
-    },
-    cancelEditRoles() {
-      this.$confirm('确认取消？')
-        .then(_ => {
-          this.editRolesShow = false
-        })
-        .catch(_ => {})
-    },
-    confirmEditRoles() {
-      this.$confirm('确认提交？')
-        .then(_ => {
-          this.editRolesShow = false
         })
         .catch(_ => {})
     }
