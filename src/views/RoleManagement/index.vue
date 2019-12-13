@@ -30,7 +30,7 @@
     </el-table>
     <el-button type="primary">新增</el-button>
     <el-button type="success" @click="editRoles">编辑</el-button>
-    <el-button type="info">删除</el-button>
+    <el-button type="info" @click="deleteUsers">删除</el-button>
     <el-dialog
       title="菜单列表"
       :visible.sync="authorizeTableVisible"
@@ -91,7 +91,7 @@
 </template>
 
 <script>
-import { getRoles, getTotalMenuList, authorizeRoles } from '@/api/RoleManagement.js'
+import { getRoles, getTotalMenuList, authorizeRoles, delRoles } from '@/api/RoleManagement.js'
 
 import store from '@/store'
 export default {
@@ -232,7 +232,6 @@ export default {
     handleSelection(val) {
       this.checkedList = val
     },
-
     // 以下是编辑按钮
     editRoles() {
       if (this.checkedList.length === 0) {
@@ -269,6 +268,36 @@ export default {
       this.editRolesShow = false
     },
     // 以上是编辑按钮
+    // 以下是删除按钮
+    deleteUsers() {
+      if (this.checkedList.length === 0) {
+        this.$alert('未勾选，请选择一个选项').then(() => {}).catch(() => {})
+      } else {
+        this.$confirm('确认提交？')
+          .then(_ => {
+            console.log(this.checkedList)
+            console.log(this.checkedList[0].assignUser)
+            console.log('------------')
+            let flag = 0
+            for (const i of this.checkedList) {
+              if (i.assignUser) {
+                console.log('发送删除请求')
+              } else {
+                flag = 1
+              }
+
+              // if (flag = 1) {
+              //   this.$alert('有选项尚未分配用户').then(() => {}).catch(() => {})
+              // }
+            }
+            console.log('============')
+
+            // delRoles()
+            // /api/v1/admin-role/del
+          })
+          .catch(_ => { })
+      }
+    },
     confirmAuthorizeTable(done) {
       this.$confirm('确认提交？')
         .then(_ => {

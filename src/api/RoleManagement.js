@@ -19,16 +19,17 @@ export function getTotalMenuList(params) {
 
 
 export function authorizeRoles(data) {
-  console.log("---授权----")
-  // const data = new window.FormData()
-  // info['access_token'] && data.append('access_token', info['access_token'])
-  // info['id'] && data.append('id', info['id'])
-  // info['name'] && data.append('name', info['name'])
-  // info['menus'] && data.append('menus', info['menus'])
-
   return request({
     url: '/api/v1/admin-role/save',
     method: 'post',
     data: qs.stringify(data)
+  })
+}
+
+export function delRoles(params) {
+  return request({
+    url: '/api/v1/admin-role/del',
+    method: 'get',
+    params
   })
 }
