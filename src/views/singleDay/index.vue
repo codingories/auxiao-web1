@@ -7,6 +7,10 @@
       @handlePrevMonth="handlePrevMonth"
       @handleNextMonth="handleNextMonth"
     />
+
+    <el-calendar v-model="elDate">
+    </el-calendar>
+
     <div class="switchDay" v-for="(item, index) in dayList" :key="index">
       <span>{{dayList[index].day}}</span>
       <el-switch v-model="dayList[index].ifWorkDay" active-text="工作日" inactive-text="休息日"></el-switch>
@@ -19,13 +23,13 @@
           <span style="margin-left: 10px">{{ scope.row.ID }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="考勤组" width="180">
-        <template slot-scope="scope">
-          <div slot="reference" class="name-wrapper">
-            <el-tag size="medium">{{ scope.row.group }}</el-tag>
-          </div>
-        </template>
-      </el-table-column>
+      <!--<el-table-column label="考勤组" width="180">-->
+        <!--<template slot-scope="scope">-->
+          <!--<div slot="reference" class="name-wrapper">-->
+            <!--<el-tag size="medium">{{ scope.row.group }}</el-tag>-->
+          <!--</div>-->
+        <!--</template>-->
+      <!--</el-table-column>-->
       <el-table-column label="是否考勤">
         <!-- <template slot-scope="scope">
           <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
@@ -52,6 +56,7 @@ export default {
   name: "date-picker",
   data() {
     return {
+      elDate: new Date(),
       value: true,
       calendarArr: {
         type: "combination",
@@ -73,13 +78,13 @@ export default {
           reference:
             "星期一,星期二,星期三,星期四,07:45:00-16:20:00;星期五,07:45:00-15:30:00;"
         },
-        {
-          ID: "2",
-          group: "非编",
-          check: true,
-          reference:
-            "星期一,星期二,星期三,星期四,07:45:00-16:20:00;星期五,07:45:00-15:30:00;"
-        }
+        // {
+        //   ID: "2",
+        //   group: "非编",
+        //   check: true,
+        //   reference:
+        //     "星期一,星期二,星期三,星期四,07:45:00-16:20:00;星期五,07:45:00-15:30:00;"
+        // }
       ],
       dayList: []
     };

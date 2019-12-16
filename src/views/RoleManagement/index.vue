@@ -12,6 +12,7 @@
             v-model="scope.row.isActive"
             active-color="#13ce66"
             inactive-color="#ff4949"
+            @change="switchActive(scope.row.isActive,scope.row.id)"
           />
         </template>
       </el-table-column>
@@ -28,9 +29,9 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-button type="primary">新增</el-button>
+    <el-button type="primary" @click="addRoles">新增</el-button>
     <el-button type="success" @click="editRoles">编辑</el-button>
-    <el-button type="info" @click="deleteUsers">删除</el-button>
+    <el-button type="info" @click="deleteRoles">删除</el-button>
     <el-dialog
       title="菜单列表"
       :visible.sync="authorizeTableVisible"
@@ -87,17 +88,33 @@
       <el-button type="success" @click="cancelDiag('editRolesShow')">取消</el-button>
       <el-button type="primary" @click="confirmEditRoles">确认</el-button>
     </el-dialog>
+    <el-dialog
+      title="新增角色"
+      :visible.sync="addRolesShow"
+      width="30%"
+      :before-close="handleClose"
+    >
+
+      <el-form ref="form" :model="editForm" label-width="80px">
+        <el-form-item label="角色名">
+          <el-input v-model="editForm.roleName" />
+        </el-form-item>
+      </el-form>
+      <el-button type="success" @click="cancelDiag('addRolesShow')">取消</el-button>
+      <el-button type="primary" @click="confirmAddRoles">确认</el-button>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { getRoles, getTotalMenuList, authorizeRoles, delRoles } from '@/api/RoleManagement.js'
+import { getRoles, getTotalMenuList, authorizeRoles, delRoles, frozenRole, getRoleInfo } from '@/api/RoleManagement.js'
 
 import store from '@/store'
 export default {
   data() {
     return {
       editForm: { roleName: '' },
+      addRolesShow: false,
       editRolesShow: false,
       alignUserTable: [{
         id: 1,
@@ -217,9 +234,7 @@ export default {
   },
 
   computed: {
-    tableHeader: function() {
-      return this.getTableHeader(this.tableYear, this.tableMonth)
-    }
+
   },
   watch: {},
 
@@ -229,9 +244,89 @@ export default {
   },
 
   methods: {
+    switchActive(isactive, id) {
+      const tempoobj = {
+        access_token: this.access_token,
+        id: id,
+        type: 'users'
+      }
+      getRoleInfo(tempoobj).then(
+        res => {
+          console.log(res.data.user_list)
+          console.log(!res.data.user_list)
+
+          if (res.data.user_list.length===0) {
+            const obj = {
+              access_token: this.access_token,
+              id: id,
+              is_active: isactive ? 1 : 0
+            }
+            frozenRole(obj).then(success => {
+              console.log(success)
+            })
+          } else {
+            // this.$alert('有用户了，无法进行激活操作')
+          }
+        }
+      )
+
+      // const obj = {
+      //   access_token: this.access_token,
+      //   id: id,
+      //   is_active: isactive ? 1 : 0
+      // }
+      // // console.log(obj)
+      // console.log('----')
+      // console.log(frozenRole(obj))
+      // frozenRole(obj).then(success => {
+      //   console.log(success)
+      // }).catch((err) => {
+      //   console.log('---==进入roles错误==---')
+      //   console.log(err)
+      // })
+      // then(success=>{
+      //   console.log(success)
+      // })
+    },
     handleSelection(val) {
       this.checkedList = val
     },
+    addRoles() {
+      const obj =
+          {
+            access_token: this.access_token,
+            name: '',
+            menus: [
+              25,
+              27
+            ]
+          }
+      this.addRolesObj = obj
+      this.addRolesShow = true
+      // authorizeRoles(obj).then(){
+      //
+      // }
+    },
+    confirmAddRoles() {
+      this.$confirm('确认提交？')
+        .then(_ => {
+          if (!this.editForm.roleName) {
+            this.$alert('名字不能为空!')
+            return
+          }
+          this.addRolesObj.name = this.editForm.roleName
+          const tempId = this.roleTable.slice(this.roleTable.length - 1, this.roleTable.length)[0].id + 1
+          const obj = { 'id': tempId, 'name': this.addRolesObj.name, isActive: 'false' }
+          authorizeRoles(this.addRolesObj).then(res => {
+            this.$alert('编辑成功!')
+            this.roleTable.push(obj)
+            this.editForm.roleName = ''
+          })
+        })
+        .catch(_ => { })
+      this.addRolesShow = false
+    },
+
     // 以下是编辑按钮
     editRoles() {
       if (this.checkedList.length === 0) {
@@ -261,39 +356,52 @@ export default {
           this.checkedList[0].name = this.editForm.roleName
           authorizeRoles(obj).then(res => {
             this.$alert('编辑成功!')
-            this.$set(this.roleTable, this.checkedList[0].id - 1, this.checkedList[0])
           })
+          console.log('==-=-=-=编辑')
+          // this.$set(this.roleTable, this.checkedList[0].id - 1, this.checkedList[0])
         })
         .catch(_ => {})
       this.editRolesShow = false
     },
     // 以上是编辑按钮
     // 以下是删除按钮
-    deleteUsers() {
+    deleteRoles() {
       if (this.checkedList.length === 0) {
         this.$alert('未勾选，请选择一个选项').then(() => {}).catch(() => {})
       } else {
         this.$confirm('确认提交？')
           .then(_ => {
-            console.log(this.checkedList)
-            console.log(this.checkedList[0].assignUser)
-            console.log('------------')
-            let flag = 0
+            let flag = true
             for (const i of this.checkedList) {
-              if (i.assignUser) {
-                console.log('发送删除请求')
+              if (!i.assignUser) {
+                continue
               } else {
-                flag = 1
+                flag = false
+                break
               }
-
-              // if (flag = 1) {
-              //   this.$alert('有选项尚未分配用户').then(() => {}).catch(() => {})
-              // }
             }
-            console.log('============')
 
-            // delRoles()
-            // /api/v1/admin-role/del
+            const obj = {
+              access_token: this.access_token
+            }
+
+            if (flag) {
+              for (const i of this.checkedList) {
+                obj.id = i.id
+                console.log(obj)
+                this.roleTable = this.roleTable.filter((item) => {
+                  return item.id != obj.id
+                })
+                delRoles(obj).then(
+                  () => {
+                    console.log('--删除成功--')
+                  }
+                )
+              }
+              // console.log('开始发送删除请求')
+            } else {
+              this.$alert('有角色分配用户了，无法进行删除操作')
+            }
           })
           .catch(_ => { })
       }
@@ -354,7 +462,7 @@ export default {
           const obj = {}
           obj.id = i.id
           obj.name = i.name
-          obj.isActive = false
+          obj.isActive = i.is_active === 1
           this.roleTable.push(obj)
         }
       })

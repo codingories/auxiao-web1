@@ -70,12 +70,8 @@ service.interceptors.response.use(
 
   response => {
     const res = response.data;
-    console.log("request.js中的,response.data;");
-    console.log(res);
     // if the custom code is not 20000, it is judged as an error.
     if (res.code !== 200) {
-      console.log("res.code");
-      console.log("200");
       Message({
         message: res.message || "Error",
         type: "error",
@@ -113,14 +109,10 @@ service.interceptors.response.use(
       type: "error",
       duration: 5 * 1000
     });
-    console.log("history1");
     // console.log(window.location.origin + "/#/login?redirect=%2FpersonalCenter");
     let temp = window.location.origin + "/#/login";
-    console.log(temp);
     removeToken("access_token");
     window.location.replace(temp);
-    console.log("history2");
-
     // return Promise.reject(error);
   }
 );
