@@ -18,9 +18,11 @@
       </el-table-column>
       <el-table-column prop="assignUser" label="分配用户">
         <template slot-scope="scope">
-          <div class="authorizeUser" @click="assignment(scope.$index, scope.row)">
-            &nbsp{{ scope.row.assignUser }}
-          </div>
+          <!--<div class="authorizeUser" @click="assignment(scope.$index, scope.row)">-->
+          <!--&nbsp{{ scope.row.assignUser }}-->
+          <!--</div>-->
+          <el-button type="primary" size="small" @click="assignment(scope.$index, scope.row)">查看</el-button>
+
         </template>
       </el-table-column>
       <el-table-column prop="operation" label="操作">
@@ -29,6 +31,7 @@
         </template>
       </el-table-column>
     </el-table>
+
     <el-button type="primary" @click="addRoles">新增</el-button>
     <el-button type="success" @click="editRoles">编辑</el-button>
     <el-button type="info" @click="deleteRoles">删除</el-button>
@@ -56,20 +59,24 @@
     <el-dialog
       title="分配用户"
       :visible.sync="alignUserShow"
-      width="30%"
+      width="60%"
       :before-close="handleClose"
     >
-      <div class="treeContainer">
-        <el-tree
-          ref="alignTree"
-          :data="alignUserTable"
-          show-checkbox
-          default-expand-all
-          node-key="id"
-          highlight-current
-          :props="defaultProps"
-        />
-      </div>
+
+      <!--<el-transfer v-model="transfer" :data="transferData"></el-transfer>-->
+
+      <tree-transfer :title="treeTransferTitle" :from_data="fromData" :to_data="toData" :default-props="{label:'label'}" :mode="mode" height="540px" filter open-all @addBtn="add" @removeBtn="remove" />
+      <!--<div class="treeContainer">-->
+      <!--<el-tree-->
+      <!--ref="alignTree"-->
+      <!--:data="alignUserTable"-->
+      <!--show-checkbox-->
+      <!--default-expand-all-->
+      <!--node-key="id"-->
+      <!--highlight-current-->
+      <!--:props="defaultProps"-->
+      <!--/>-->
+      <!--</div>-->
       <el-button type="success" @click="cancelDiag('alignUserShow')">取消</el-button>
       <el-button type="primary" @click="confirmAlignUserTable">确认</el-button>
     </el-dialog>
@@ -108,11 +115,162 @@
 
 <script>
 import { getRoles, getTotalMenuList, authorizeRoles, delRoles, frozenRole, getRoleInfo } from '@/api/RoleManagement.js'
-
 import store from '@/store'
+import treeTransfer from 'el-tree-transfer' // 引入
 export default {
+  components: { treeTransfer },
   data() {
+    const generateData = _ => {
+      const data = []
+      for (let i = 1; i <= 15; i++) {
+        data.push({
+          key: i,
+          label: `备选项 ${i}`,
+          disabled: i % 4 === 0
+        })
+      }
+      return data
+    }
+
     return {
+      treeTransferTitle: ['全选', '全选'],
+      mode: 'transfer', // transfer addressList
+      fromData: [
+
+        // {
+        //   id: 1,
+        //   title: '工程部',
+        //   children: [{
+        //     id: 4,
+        //     title: '周杰伦'
+        //   }, {
+        //     id: 5,
+        //     title: '江泽民'
+        //   }, {
+        //     id: 6,
+        //     title: '邓小平'
+        //   }]
+        // }, {
+        //   id: 11,
+        //   title: '教研部',
+        //   children: [{
+        //     id: 7,
+        //     title: '奥巴马'
+        //   }, {
+        //     id: 8,
+        //     title: '习近平'
+        //   }, {
+        //     id: 9,
+        //     title: '周星驰'
+        //   }]
+        // }, {
+        //   id: 10,
+        //   title: '售后部',
+        //   children: [{
+        //     id: 11,
+        //     title: '姚明'
+        //   }, {
+        //     id: 12,
+        //     title: '刘翔'
+        //   }, {
+        //     id: 13,
+        //     title: '孙悟空'
+        //   }, {
+        //     id: 14,
+        //     title: '漩涡鸣人'
+        //   }, {
+        //     id: 15,
+        //     title: '路飞'
+        //   }]
+        // },
+        // {
+        //   id: 31,
+        //   title: '客服部',
+        //   children: [{
+        //     id: 24,
+        //     title: '迪丽热巴'
+        //   }, {
+        //     id: 25,
+        //     title: '莫妮卡'
+        //   }, {
+        //     id: 27,
+        //     title: '米歇尔'
+        //   }]
+        // }
+
+        {
+          id: '1',
+          pid: 0,
+          label: '工程部',
+          children: [
+            {
+              id: '4',
+              pid: '1',
+              label: '周杰伦'
+              // disabled: true,
+            },
+            {
+              id: '5',
+              pid: '1',
+              label: '江泽民'
+            },
+            {
+              id: '6',
+              pid: '1',
+              label: '邓小平'
+            }
+          ]
+        },
+        {
+          id: '2',
+          pid: 0,
+          label: '教研部',
+          children: [
+            {
+              id: '7',
+              pid: '2',
+              label: '奥巴马'
+            },
+            {
+              id: '8',
+              pid: '2',
+              label: '习近平'
+            },
+            {
+              id: '9',
+              pid: '2',
+              label: '周星驰'
+            }
+          ]
+        },
+        {
+          id: '3',
+          pid: 0,
+          label: '客服部',
+          children: [
+            {
+              id: '27',
+              pid: '3',
+              label: '迪丽热巴'
+              // disabled: true,
+            },
+            {
+              id: '25',
+              pid: '3',
+              label: '莫妮卡'
+            },
+            {
+              id: '26',
+              pid: '3',
+              label: '米歇尔'
+            }
+          ]
+        }
+      ],
+      toData: [],
+
+      transferData: generateData(),
+      transfer: [1, 4],
       editForm: { roleName: '' },
       addRolesShow: false,
       editRolesShow: false,
@@ -183,41 +341,7 @@ export default {
         children: 'children',
         label: 'title'
       },
-      authorizeTable: [{
-        id: 1,
-        title: '一级 1',
-        children: [{
-          id: 4,
-          title: '二级 1-1',
-          children: [{
-            id: 9,
-            title: '三级 1-1-1'
-          }, {
-            id: 10,
-            title: '三级 1-1-2'
-          }]
-        }]
-      }, {
-        id: 2,
-        label: '一级 2',
-        children: [{
-          id: 5,
-          label: '二级 2-1'
-        }, {
-          id: 6,
-          label: '二级 2-2'
-        }]
-      }, {
-        id: 3,
-        label: '一级 3',
-        children: [{
-          id: 7,
-          label: '二级 3-1'
-        }, {
-          id: 8,
-          label: '二级 3-2'
-        }]
-      }],
+      authorizeTable: [],
       value: true,
       access_token: store.getters.token,
       getRolesLoading: false,
@@ -244,6 +368,20 @@ export default {
   },
 
   methods: {
+    add(fromData, toData, obj) {
+      // 树形穿梭框模式transfer时，返回参数为左侧树移动后数据、右侧树移动后数据、移动的{keys,nodes,halfKeys,halfNodes}对象
+      // 通讯录模式addressList时，返回参数为右侧收件人列表、右侧抄送人列表、右侧密送人列表
+      console.log('fromData:', fromData)
+      console.log('toData:', toData)
+      console.log('obj:', obj)
+    },
+    remove(fromData, toData, obj) {
+      // 树形穿梭框模式transfer时，返回参数为左侧树移动后数据、右侧树移动后数据、移动的{keys,nodes,halfKeys,halfNodes}对象
+      // 通讯录模式addressList时，返回参数为右侧收件人列表、右侧抄送人列表、右侧密送人列表
+      console.log('fromData:', fromData)
+      console.log('toData:', toData)
+      console.log('obj:', obj)
+    },
     switchActive(isactive, id) {
       const tempoobj = {
         access_token: this.access_token,
@@ -255,7 +393,7 @@ export default {
           console.log(res.data.user_list)
           console.log(!res.data.user_list)
 
-          if (res.data.user_list.length===0) {
+          if (res.data.user_list.length === 0) {
             const obj = {
               access_token: this.access_token,
               id: id,
@@ -477,23 +615,24 @@ export default {
     confirmAlignUserTable() {
       this.$confirm('确认提交？')
         .then(_ => {
-          const menus = this.$refs.alignTree.getCheckedNodes()
-          let str = ''
-          const section = { '工程部': '', '教研部': '', '售后部': '', '客服部': '' }
-          for (const i of menus) {
-            if (i.title in section) {
-            } else {
-              str += i.title + ','
-            }
-          }
-          this.alignRow['assignUser'] = str
-          this.$set(this.roleTable, this.alignIndex, this.alignRow)
           this.alignUserShow = false
-          this.$refs.alignTree.setCheckedKeys([])
+
+          // const menus = this.$refs.alignTree.getCheckedNodes()
+          // let str = ''
+          // const section = { '工程部': '', '教研部': '', '售后部': '', '客服部': '' }
+          // for (const i of menus) {
+          //   if (i.title in section) {
+          //   } else {
+          //     str += i.title + ','
+          //   }
+          // }
+          // this.alignRow['assignUser'] = str
+          // this.$set(this.roleTable, this.alignIndex, this.alignRow)
+          // this.$refs.alignTree.setCheckedKeys([])
         })
         .catch(_ => {})
     }
-  }
+  } // 注册
 }
 </script>
 
