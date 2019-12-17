@@ -111,8 +111,9 @@ service.interceptors.response.use(
     });
     // console.log(window.location.origin + "/#/login?redirect=%2FpersonalCenter");
     let temp = window.location.origin + "/#/login";
-    removeToken("access_token");
-    window.location.replace(temp);
+    // removeToken("access_token");
+    // window.location.replace(temp);
+
     // return Promise.reject(error);
   }
 );

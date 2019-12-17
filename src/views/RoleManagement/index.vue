@@ -114,7 +114,7 @@
 </template>
 
 <script>
-import { getRoles, getTotalMenuList, authorizeRoles, delRoles, frozenRole, getRoleInfo } from '@/api/RoleManagement.js'
+import { getRoles, getTotalMenuList, authorizeRoles, delRoles, frozenRole, getRoleInfo, getUsers } from '@/api/RoleManagement.js'
 import store from '@/store'
 import treeTransfer from 'el-tree-transfer' // 引入
 export default {
@@ -135,138 +135,7 @@ export default {
     return {
       treeTransferTitle: ['全选', '全选'],
       mode: 'transfer', // transfer addressList
-      fromData: [
-
-        // {
-        //   id: 1,
-        //   title: '工程部',
-        //   children: [{
-        //     id: 4,
-        //     title: '周杰伦'
-        //   }, {
-        //     id: 5,
-        //     title: '江泽民'
-        //   }, {
-        //     id: 6,
-        //     title: '邓小平'
-        //   }]
-        // }, {
-        //   id: 11,
-        //   title: '教研部',
-        //   children: [{
-        //     id: 7,
-        //     title: '奥巴马'
-        //   }, {
-        //     id: 8,
-        //     title: '习近平'
-        //   }, {
-        //     id: 9,
-        //     title: '周星驰'
-        //   }]
-        // }, {
-        //   id: 10,
-        //   title: '售后部',
-        //   children: [{
-        //     id: 11,
-        //     title: '姚明'
-        //   }, {
-        //     id: 12,
-        //     title: '刘翔'
-        //   }, {
-        //     id: 13,
-        //     title: '孙悟空'
-        //   }, {
-        //     id: 14,
-        //     title: '漩涡鸣人'
-        //   }, {
-        //     id: 15,
-        //     title: '路飞'
-        //   }]
-        // },
-        // {
-        //   id: 31,
-        //   title: '客服部',
-        //   children: [{
-        //     id: 24,
-        //     title: '迪丽热巴'
-        //   }, {
-        //     id: 25,
-        //     title: '莫妮卡'
-        //   }, {
-        //     id: 27,
-        //     title: '米歇尔'
-        //   }]
-        // }
-
-        {
-          id: '1',
-          pid: 0,
-          label: '工程部',
-          children: [
-            {
-              id: '4',
-              pid: '1',
-              label: '周杰伦'
-              // disabled: true,
-            },
-            {
-              id: '5',
-              pid: '1',
-              label: '江泽民'
-            },
-            {
-              id: '6',
-              pid: '1',
-              label: '邓小平'
-            }
-          ]
-        },
-        {
-          id: '2',
-          pid: 0,
-          label: '教研部',
-          children: [
-            {
-              id: '7',
-              pid: '2',
-              label: '奥巴马'
-            },
-            {
-              id: '8',
-              pid: '2',
-              label: '习近平'
-            },
-            {
-              id: '9',
-              pid: '2',
-              label: '周星驰'
-            }
-          ]
-        },
-        {
-          id: '3',
-          pid: 0,
-          label: '客服部',
-          children: [
-            {
-              id: '27',
-              pid: '3',
-              label: '迪丽热巴'
-              // disabled: true,
-            },
-            {
-              id: '25',
-              pid: '3',
-              label: '莫妮卡'
-            },
-            {
-              id: '26',
-              pid: '3',
-              label: '米歇尔'
-            }
-          ]
-        }
-      ],
+      fromData: [],
       toData: [],
 
       transferData: generateData(),
@@ -607,10 +476,26 @@ export default {
     },
     // 分配用户模块
     assignment(index, row) {
-      console.log(index, row)
+      // console.log(index, row)
       this.alignIndex = index
       this.alignRow = row
+      this.getAllUsers()
       this.alignUserShow = true
+    },
+    getAllUsers() {
+      const obj = {
+        access_token: this.access_token
+      }
+      getUsers(obj).then(
+        res => {
+          const bbb = JSON.parse(JSON.stringify(res.data).replace(/name/g, 'label'))
+          console.log(JSON.stringify(bbb).replace(/label: null/g, 'label: other'))
+          // let ccc = JSON.parse(JSON.stringify(bbb).replace(/label: null/g, 'label: other'))
+          // let ccc = JSON.parse(JSON.stringify(bbb).replace(/"label":null/g, '"label":other'))
+          // console.log(ccc)
+          this.fromData = bbb
+        }
+      )
     },
     confirmAlignUserTable() {
       this.$confirm('确认提交？')

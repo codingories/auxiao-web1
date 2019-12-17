@@ -53,15 +53,21 @@ export function frozenRole(params) {
 
 export function distributeUser(params) {
   return request({
-    url: '​/api​/v1​/admin-role​/distribute-user',
+    url: '/api​/v1​/admin-role​/distribute-user',
     method: 'get',
     params
   })
 }
 
+export function getUsers(params) {
+  console.log(params)
+  return request({
+    url: '/api/v1/admin-role/user-list',
+    method: 'get',
+    params
+  })
+}
 
-
-// ​/api​/v1​/admin-role​/distribute-user
 
 
 
