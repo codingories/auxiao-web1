@@ -54,7 +54,7 @@ export function distributeUser(params) {
   console.log(params)
   return request({
     url: '/api/v1/admin-role/distribute-user',
-    method: 'get',
+    method: 'post',
     // params
     data: qs.stringify(params)
   })

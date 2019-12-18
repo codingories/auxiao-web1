@@ -516,7 +516,10 @@ export default {
             this.$alert('当前未选择用户')
           } else {
             distributeUser(obj).then(() => {
-              console.log('修改成功')
+              this.$alert('修改成功')
+              this.alignUserShow = false
+              this.fromData = []
+              this.toData = []
             })
           }
 
