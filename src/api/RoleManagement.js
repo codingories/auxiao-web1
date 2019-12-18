@@ -33,7 +33,6 @@ export function delRoles(params) {
   })
 }
 
-
 export function getRoleInfo(params) {
   return request({
     url: '/api/v1/admin-role/show',
@@ -41,7 +40,6 @@ export function getRoleInfo(params) {
     params
   })
 }
-
 
 export function frozenRole(params) {
   return request({
@@ -52,39 +50,39 @@ export function frozenRole(params) {
 }
 
 export function distributeUser(params) {
+  console.log('params')
+  console.log(params)
   return request({
-    url: '/api​/v1​/admin-role​/distribute-user',
+    url: '/api/v1/admin-role/distribute-user',
     method: 'get',
-    params
+    // params
+    data: qs.stringify(params)
   })
 }
 
 export function getUsers(params) {
+  console.log('params')
   console.log(params)
   return request({
     url: '/api/v1/admin-role/user-list',
     method: 'get',
+    headers: { 'content-type': 'application/json' },
     params
   })
 }
 
+// request.put(
+//   {
+//     url: '/api/v1/admin-role/activate'
+//   }
+// )
 
-
-
-
-  // request.put(
-  //   {
-  //     url: '/api/v1/admin-role/activate'
-  //   }
-  // )
-
-  // console.log(request.put({'/api/v1/admin-role/activate'}))
-  // return request({
-  //   url: '/api/v1/admin-role/activate',
-  //   method: 'put',
-  //   params
-  // })
-
+// console.log(request.put({'/api/v1/admin-role/activate'}))
+// return request({
+//   url: '/api/v1/admin-role/activate',
+//   method: 'put',
+//   params
+// })
 
 // method: 'delete',
 // url: '/api/v1/admin-role/del',

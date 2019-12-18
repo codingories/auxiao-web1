@@ -21,7 +21,7 @@
           <!--<div class="authorizeUser" @click="assignment(scope.$index, scope.row)">-->
           <!--&nbsp{{ scope.row.assignUser }}-->
           <!--</div>-->
-          <el-button type="primary" size="small" @click="assignment(scope.$index, scope.row)">查看</el-button>
+          <el-button type="primary" size="small" @click="assignment(scope.$index, scope.row)">分配</el-button>
 
         </template>
       </el-table-column>
@@ -114,7 +114,7 @@
 </template>
 
 <script>
-import { getRoles, getTotalMenuList, authorizeRoles, delRoles, frozenRole, getRoleInfo, getUsers } from '@/api/RoleManagement.js'
+import { getRoles, getTotalMenuList, authorizeRoles, delRoles, frozenRole, getRoleInfo, getUsers, distributeUser } from '@/api/RoleManagement.js'
 import store from '@/store'
 import treeTransfer from 'el-tree-transfer' // 引入
 export default {
@@ -223,6 +223,7 @@ export default {
       alignIndex: '',
       alignRow: '',
       checkedList: []
+
     }
   },
 
@@ -242,6 +243,8 @@ export default {
       // 通讯录模式addressList时，返回参数为右侧收件人列表、右侧抄送人列表、右侧密送人列表
       console.log('fromData:', fromData)
       console.log('toData:', toData)
+      this.fromData = fromData
+      this.toData = toData
       console.log('obj:', obj)
     },
     remove(fromData, toData, obj) {
@@ -249,6 +252,8 @@ export default {
       // 通讯录模式addressList时，返回参数为右侧收件人列表、右侧抄送人列表、右侧密送人列表
       console.log('fromData:', fromData)
       console.log('toData:', toData)
+      this.fromData = fromData
+      this.toData = toData
       console.log('obj:', obj)
     },
     switchActive(isactive, id) {
@@ -488,19 +493,34 @@ export default {
       }
       getUsers(obj).then(
         res => {
-          const bbb = JSON.parse(JSON.stringify(res.data).replace(/name/g, 'label'))
-          console.log(JSON.stringify(bbb).replace(/label: null/g, 'label: other'))
-          // let ccc = JSON.parse(JSON.stringify(bbb).replace(/label: null/g, 'label: other'))
-          // let ccc = JSON.parse(JSON.stringify(bbb).replace(/"label":null/g, '"label":other'))
-          // console.log(ccc)
-          this.fromData = bbb
+          const ccc = JSON.stringify(res.data).replace(/\"label\":null/g, '"label":"其他"')
+          const ddd = ccc.replace(/\"id\":null/g, '"id":999')
+          const eee = JSON.parse(ddd.replace(/\"pid\":null/g, '"pid":999'))
+          this.fromData = eee
         }
       )
     },
     confirmAlignUserTable() {
       this.$confirm('确认提交？')
         .then(_ => {
-          this.alignUserShow = false
+          const obj = { access_token: this.access_token, role_id: this.alignRow.id }
+          const templist = []
+          for (const i of this.toData) {
+            for (const j of i.children) {
+              templist.push(j.id)
+            }
+          }
+          obj.users = templist
+
+          if (obj.users.length === 0) {
+            this.$alert('当前未选择用户')
+          } else {
+            distributeUser(obj).then(() => {
+              console.log('修改成功')
+            })
+          }
+
+          // this.alignUserShow = false
 
           // const menus = this.$refs.alignTree.getCheckedNodes()
           // let str = ''
